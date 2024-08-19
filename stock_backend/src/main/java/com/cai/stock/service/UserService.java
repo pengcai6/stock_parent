@@ -5,6 +5,8 @@ import com.cai.stock.vo.req.LoginReqVo;
 import com.cai.stock.vo.resp.LoginRespVo;
 import com.cai.stock.vo.resp.R;
 
+import java.util.Map;
+
 /**
  * 定义用户服务接口
  */
@@ -24,4 +26,9 @@ public interface UserService {
      * @return
      */
     R<LoginRespVo> login(LoginReqVo vo);
+    /**
+     * 生成图片验证码功能
+     * @return
+     */
+    R<Map> getCaptchaId();
 }

@@ -31,6 +31,36 @@
         from stock_rt_info
         where  id = #{id,jdbcType=BIGINT} 
     </select>
+    <select id="getStockInfoByTime" resultType="com.cai.stock.pojo.domain.StockUpdownDomain">
+        select
+            sri.trade_amount as tradeAmt,
+            sri.pre_close_price as preClosePrice,
+            (sri.max_price- sri.min_price)/sri.pre_close_price as amplitude,
+            sri.stock_code as code,
+            sri.stock_name as name,
+            sri.cur_time   as curDate,
+            sri.trade_volume as tradeVol,
+            (sri.cur_price-sri.pre_close_price) as increase,
+            (sri.cur_price- sri.pre_close_price)/sri.pre_close_price as upDown,
+            sri.cur_price as tradePrice
+        from stock_rt_info as sri
+        where sri.cur_time=#{curDate}
+        order by upDown desc
+    </select>
+    <select id="getStockUpdownCount" resultType="map">
+        SELECT DATE_FORMAT(tmp.time, '%Y%m%d%H%i') as time,
+        count(*) AS count
+        FROM (SELECT (sri.cur_price - sri.pre_close_price) / sri.pre_close_price AS ud,
+        sri.cur_time AS time
+        FROM stock_rt_info AS sri
+        WHERE sri.cur_time BETWEEN #{startDate}
+        AND #{endDate}
+        HAVING ud
+        <if test="flag==1">>= 0.1</if>
+        <if test="flag==0">&lt;= -0.1</if>
+        ) AS tmp
+        GROUP BY tmp.time;
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from stock_rt_info

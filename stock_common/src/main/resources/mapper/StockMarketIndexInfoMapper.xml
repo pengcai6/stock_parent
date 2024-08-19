@@ -31,6 +31,28 @@
         from stock_market_index_info
         where  id = #{id,jdbcType=BIGINT} 
     </select>
+    <select id="getMarketInfo" resultType="com.cai.stock.pojo.domain.InnerMarketDomain">
+        SELECT
+            smi.market_code AS code,
+            smi.market_name AS name,
+            smi.open_point AS openPoint,
+            smi.cur_point AS curPoint,
+            smi.pre_close_point AS preClosePoint,
+            smi.trade_amount AS tradeAmt,
+            smi.trade_volume AS tradeVol,
+            smi.cur_point-smi.pre_close_point AS upDown,
+            (smi.cur_point-smi.pre_close_point)/smi.pre_close_point AS rose,
+            (smi.max_point-smi.min_point)/smi.pre_close_point AS amplitude,
+            smi.cur_time AS curTime
+        FROM
+            stock_market_index_info  AS smi
+        WHERE
+            cur_time = #{curDate}
+          AND market_code IN
+        <foreach collection="marketCodes" item="mCode" open="(" close=")" separator=",">
+            #{mCode}
+        </foreach>
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from stock_market_index_info

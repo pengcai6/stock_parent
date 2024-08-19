@@ -3,6 +3,8 @@ package com.cai.stock.mapper;
 import com.cai.stock.pojo.entity.SysUser;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
 * @author cai
 * @description 针对表【sys_user(用户表)】的数据库操作Mapper
@@ -25,4 +27,9 @@ public interface SysUserMapper {
 
     SysUser findUserInfoByUsername(@Param("username") String username);
 
+    /**
+     * 查询所有用户信息
+     * @return
+     */
+     List<SysUser> FindAll();
 }
