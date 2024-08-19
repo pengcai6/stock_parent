@@ -1,0 +1,110 @@
+package com.cai.stock.controller;
+
+import cn.hutool.http.server.HttpServerResponse;
+import com.cai.stock.pojo.domain.InnerMarketDomain;
+import com.cai.stock.pojo.domain.StockBlockDomain;
+import com.cai.stock.pojo.domain.StockUpdownDomain;
+import com.cai.stock.service.StockService;
+import com.cai.stock.vo.resp.PageResult;
+import com.cai.stock.vo.resp.R;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 定义股票接口相关控制器
+ */
+@Api(value = "/api/quot", tags = {"定义股票接口相关控制器"})
+@RestController()
+@RequestMapping("/api/quot")
+public class StockController {
+    @Autowired
+    private StockService stockService;
+
+    /**
+     * 获取国内大盘最新的数据
+     *
+     * @return
+     */
+    @ApiOperation(value = "获取国内大盘最新的数据", notes = "获取国内大盘最新的数据", httpMethod = "GET")
+    @GetMapping("/index/all")
+    public R<List<InnerMarketDomain>> getInnerMarketInfo() {
+        return stockService.getInnerMarketInfo();
+    }
+
+    /**
+     * 查询沪深两市最新的板块行情数据，并按照交易金额降序排序展示前10条记录
+     *
+     * @return
+     */
+    @ApiOperation(value = "查询沪深两市最新的板块行情数据，并按照交易金额降序排序展示前10条记录", notes = "查询沪深两市最新的板块行情数据，并按照交易金额降序排序展示前10条记录", httpMethod = "GET")
+    @GetMapping("/sector/all")
+    public R<List<StockBlockDomain>> sectorAll() {
+        return stockService.sectorAllLimit();
+    }
+
+    /**
+     * 分页查询最新的股票交易数据
+     *
+     * @param page     当前页
+     * @param pageSize 每页大小
+     * @return
+     */
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", dataType = "int", name = "page", value = "当前页"),
+            @ApiImplicitParam(paramType = "query", dataType = "int", name = "pageSize", value = "每页大小")
+    })
+    @ApiOperation(value = "分页查询最新的股票交易数据", notes = "分页查询最新的股票交易数据", httpMethod = "GET")
+    @GetMapping("/stock/all")
+    public R<PageResult<StockUpdownDomain>> getStockInfoByPage(@RequestParam(value = "page", required = false, defaultValue = "1") Integer page, @RequestParam(value = "pageSize", required = false, defaultValue = "20") Integer pageSize) {
+        return stockService.getStockInfoByPage(page, pageSize);
+    }
+
+    /**
+     * 统计沪深两市个股最新交易数据，并按涨幅降序排序查询前4条数据
+     * @return
+     */
+    @ApiOperation(value = "统计沪深两市个股最新交易数据，并按涨幅降序排序查询前4条数据", notes = "统计沪深两市个股最新交易数据，并按涨幅降序排序查询前4条数据", httpMethod = "GET")
+    @GetMapping("/stock/increase")
+    public  R<List<StockUpdownDomain>> getStockInfo4ByPage() {
+        return stockService.getStockInfo4ByPage();
+    }
+
+    /**
+     * 统计沪深两市T日(当前股票交易日)每分钟达到涨跌停股票的数据
+     * @return
+     */
+    @ApiOperation(value = "统计沪深两市T日(当前股票交易日)每分钟达到涨跌停股票的数据", notes = "统计沪深两市T日(当前股票交易日)每分钟达到涨跌停股票的数据", httpMethod = "GET")
+    @GetMapping("/stock/updown/count")
+    public R<Map<String,List>> getStockUpDownCount(){
+        return stockService.getStockUpDownCount();
+    }
+
+    /**
+     * 导出指定页码的最新股票信息
+     * @param page 页码
+     * @param pageSize 每页大小
+     * @param response 响应
+     */
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", dataType = "int", name = "page", value = "页码"),
+            @ApiImplicitParam(paramType = "query", dataType = "int", name = "pageSize", value = "每页大小")
+    })
+    @ApiOperation(value = "导出指定页码的最新股票信息", notes = "导出指定页码的最新股票信息", httpMethod = "GET")
+    @GetMapping("/stock/export")
+    public void exportStockUpDownInfo(@RequestParam(value = "page", required = false, defaultValue = "1") Integer page, @RequestParam(value = "pageSize", required = false, defaultValue = "20") Integer pageSize, HttpServletResponse response) {
+        stockService.exportStockUpDownInfo(page, pageSize, response);
+    }
+
+}
