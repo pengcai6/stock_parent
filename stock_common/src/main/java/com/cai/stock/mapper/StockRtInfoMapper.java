@@ -1,6 +1,12 @@
 package com.cai.stock.mapper;
 
+import com.cai.stock.pojo.domain.StockUpdownDomain;
 import com.cai.stock.pojo.entity.StockRtInfo;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
 * @author cai
@@ -22,4 +28,19 @@ public interface StockRtInfoMapper {
 
     int updateByPrimaryKey(StockRtInfo record);
 
+    /**
+     * 查询指定时间点下股票数据的集合
+     * @param curDate 日期时间
+     * @return
+     */
+    List<StockUpdownDomain> getStockInfoByTime(@Param("curDate") Date curDate);
+
+    /**
+     * 统计指定时间内的股票涨停或者跌停的数量流水
+      * @param startDate 开始时间，一般指开盘时间
+     * @param endDate 截止时间
+     * @param flag 约点，0表示跌停，1表示涨停
+     * @return
+     */
+    List<Map> getStockUpdownCount(@Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("flag") int flag);
 }

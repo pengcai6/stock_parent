@@ -17,6 +17,8 @@ spring:
       # 获取连接时最大等待时间，单位毫秒。配置了 maxWait 之后，缺省启用公平锁，
       # 并发效率会有所下降，如果需要可以通过配置 useUnfairLock 属性为 true 使用非公平锁。
       maxWait: 60000
+  profiles:
+    active: cache,stock #激活其它配置文件，如果存在多个配置文件，以逗号进行间隔即可
 # mybatis配置
 mybatis:
   mapper-locations: classpath:mapper/*.xml #配置加载mapperxml资源
@@ -28,4 +30,3 @@ mybatis:
 pagehelper:
   helper-dialect: mysql #配置分页的方言(数据库类型)
   reasonable: true #开启合理查询 比如总页数100，查询101页会查询最后一页，当查询-1页，默认查询第一页
-
