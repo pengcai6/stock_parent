@@ -61,10 +61,100 @@
         ) AS tmp
         GROUP BY tmp.time;
     </select>
+<!--当sql中存在大量需要转义的特殊字符时，会造成转换工作量的加大，同时阅读体验较差-->
+<!--    <select id="getIncreaseStockInfoByDate" resultType="map">-->
+<!--        select-->
+<!--        tmp2.title,-->
+<!--        count(*) as count-->
+<!--        from-->
+<!--        (select-->
+<!--        CASE-->
+<!--        WHEN tmp.rate > 0.07 THEN  '>7%'-->
+<!--        WHEN tmp.rate > 0.05 AND tmp.rate  &lt;= 0.07 THEN '5~7%'-->
+<!--        WHEN tmp.rate > 0.03 AND tmp.rate  &lt;= 0.05 THEN '3~5%'-->
+<!--        WHEN tmp.rate > 0 AND tmp.rate     &lt;= 0.03 THEN '0~3%'-->
+<!--        WHEN tmp.rate > -0.03 AND tmp.rate &lt;= 0 THEN '-3~0%'-->
+<!--        WHEN tmp.rate > -0.05 AND tmp.rate &lt;= -0.03 THEN '-5~-3%'-->
+<!--        WHEN tmp.rate > -0.07 AND tmp.rate &lt;= -0.05 THEN '-7~-5%'-->
+<!--        ELSE '&lt;-7%'-->
+<!--        END 'title'-->
+<!--        from-->
+<!--        (select-->
+<!--        (sri.cur_price-sri.pre_close_price)/sri.pre_close_price as rate-->
+<!--        from stock_rt_info as sri-->
+<!--        where sri.cur_time=#{dateTime})-->
+<!--        as tmp)-->
+<!--        as tmp2 group by tmp2.title-->
+<!--    </select>  -->
+
+    <select id="getIncreaseStockInfoByDate" resultType="map">
+        <![CDATA[
+        select
+        tmp2.title,
+        count(*) as count
+        from
+        (select
+        CASE
+        WHEN tmp.rate > 0.07 THEN  '>7%'
+        WHEN tmp.rate > 0.05 AND tmp.rate  <= 0.07 THEN '5~7%'
+        WHEN tmp.rate > 0.03 AND tmp.rate  <= 0.05 THEN '3~5%'
+        WHEN tmp.rate > 0 AND tmp.rate     <= 0.03 THEN '0~3%'
+        WHEN tmp.rate > -0.03 AND tmp.rate <= 0 THEN '-3~0%'
+        WHEN tmp.rate > -0.05 AND tmp.rate <= -0.03 THEN '-5~-3%'
+        WHEN tmp.rate > -0.07 AND tmp.rate <= -0.05 THEN '-7~-5%'
+        ELSE '<-7%'
+        END 'title'
+        from
+        (select
+        (sri.cur_price-sri.pre_close_price)/sri.pre_close_price as rate
+        from stock_rt_info as sri
+        where sri.cur_time=#{dateTime})
+        as tmp)
+        as tmp2 group by tmp2.title ]]>
+    </select>
+    <select id="getStockInfo4Minute" resultType="com.cai.stock.pojo.domain.Stock4MinuteDomain">
+        select sri.cur_time        as date,
+               sri.trade_amount    as tradeAmt,
+               sri.stock_code      as code,
+               sri.min_price          lowPrice,
+               sri.pre_close_price as preClosePrice,
+               sri.stock_name      as name,
+               sri.max_price       as highPrice,
+               sri.open_price      as openPrice,
+               sri.trade_volume    as tradeVol,
+               sri.cur_price       as tradePrice
+        from stock_rt_info as sri
+        where sri.stock_code = #{stockCode}
+          and sri.cur_time between #{startDate} and #{endDate};
+    </select>
+    <select id="getStock4DkLine" resultType="com.cai.stock.pojo.domain.Stock4EvrDayDomain">
+
+        select
+
+
+            sri.cur_time as date,
+            sri.trade_amount as tradeAmt,
+            sri.stock_code as code,
+            sri.min_price as lowPrice,
+            sri.stock_name as name,
+            sri.max_price as highPrice,
+            sri.open_price as openPrice,
+            sri.trade_volume as tradeVol,
+            sri.cur_price as closePrice,
+            sri.pre_close_price as preClosePrice
+        from stock_rt_info as sri
+        where stock_code = '600016'
+          and cur_time in (select max(cur_time) as mxTime
+                           from stock_rt_info
+                           where cur_time between #{startDate} and #{endDate}
+                             AND stock_code = #{stockCode}
+                           GROUP BY DATE_FORMAT(cur_time, '%Y%m%d'))
+        group by date
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from stock_rt_info
-        where  id = #{id,jdbcType=BIGINT} 
+        where  id = #{id,jdbcType=BIGINT}
     </delete>
     <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.cai.stock.pojo.entity.StockRtInfo" useGeneratedKeys="true">
         insert into stock_rt_info

@@ -1,8 +1,6 @@
 package com.cai.stock.service;
 import cn.hutool.http.server.HttpServerResponse;
-import com.cai.stock.pojo.domain.InnerMarketDomain;
-import com.cai.stock.pojo.domain.StockBlockDomain;
-import com.cai.stock.pojo.domain.StockUpdownDomain;
+import com.cai.stock.pojo.domain.*;
 import com.cai.stock.vo.resp.PageResult;
 import com.cai.stock.vo.resp.R;
 
@@ -49,4 +47,32 @@ public interface StockService {
      * @param response 响应
      */
     void exportStockUpDownInfo(Integer page, Integer pageSize, HttpServletResponse response);
+
+    /**
+     * 统计国内A股大盘T日和T-1日成交量对比功能（成交量为沪市和深市成交量之和）
+     * @return
+     */
+    R<Map<String, List>> getComparedStockTradeAmt();
+    /**
+     * 统计当前时间下（精确到分钟），A股在各个涨跌区间股票的数量
+     * @return
+     */
+    R<Map> getIncreaseStockInfo();
+    /**
+     * 获取指定股票指定T日每分钟交易数据
+     * @param stockCode 股票编码
+     * @return
+     */
+    R<List<Stock4MinuteDomain>> getStockScreenTimeSharing(String stockCode);
+    /**
+     * 获取国外大盘最新的数据
+     * @return
+     */
+    R<List<ExternalMarKetDomain>> getExternalMarketInfo();
+    /**
+     *  单个个股日K 数据查询 ，可以根据时间区间查询数日的K线数据
+     * @param stockCode 股票编码
+     * @return
+     */
+    R<List<Stock4EvrDayDomain>> getStockScreenDkLine(String stockCode);
 }

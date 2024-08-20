@@ -1,9 +1,8 @@
 package com.cai.stock.controller;
 
 import cn.hutool.http.server.HttpServerResponse;
-import com.cai.stock.pojo.domain.InnerMarketDomain;
-import com.cai.stock.pojo.domain.StockBlockDomain;
-import com.cai.stock.pojo.domain.StockUpdownDomain;
+import com.cai.stock.mapper.StockRtInfoMapper;
+import com.cai.stock.pojo.domain.*;
 import com.cai.stock.service.StockService;
 import com.cai.stock.vo.resp.PageResult;
 import com.cai.stock.vo.resp.R;
@@ -13,10 +12,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -43,6 +39,15 @@ public class StockController {
         return stockService.getInnerMarketInfo();
     }
 
+    /**
+     * 获取国外大盘最新的数据
+     * @return
+     */
+    @ApiOperation(value = "获取国外大盘最新的数据", notes = "获取国外大盘最新的数据", httpMethod = "GET")
+    @GetMapping("/external/index")
+    public R<List<ExternalMarKetDomain>> getExternalMarketInfo(){
+        return stockService.getExternalMarketInfo();
+    }
     /**
      * 查询沪深两市最新的板块行情数据，并按照交易金额降序排序展示前10条记录
      *
@@ -107,4 +112,51 @@ public class StockController {
         stockService.exportStockUpDownInfo(page, pageSize, response);
     }
 
+    /**
+     * 统计国内A股大盘T日和T-1日成交量对比功能（成交量为沪市和深市成交量之和）
+     * @return
+     */
+    @ApiOperation(value = "统计国内A股大盘T日和T-1日成交量对比功能（成交量为沪市和深市成交量之和）", notes = "统计国内A股大盘T日和T-1日成交量对比功能（成交量为沪市和深市成交量之和）", httpMethod = "GET")
+    @GetMapping("/stock/tradeAmt")
+    public R<Map<String,List>> getComparedStockTradeAmt(){
+        return stockService.getComparedStockTradeAmt();
+    }
+
+    /**
+     * 统计当前时间下（精确到分钟），A股在各个涨跌区间股票的数量
+     * @return
+     */
+    @ApiOperation(value = "统计当前时间下（精确到分钟），A股在各个涨跌区间股票的数量", notes = "统计当前时间下（精确到分钟），A股在各个涨跌区间股票的数量", httpMethod = "GET")
+    @GetMapping("/stock/updown")
+    public R<Map> getIncreaseStockInfo(){
+    return stockService.getIncreaseStockInfo();
+    }
+
+    /**
+     * 获取指定股票指定T日每分钟交易数据
+     * @param stockCode 股票编码
+     * @return
+     */
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", dataType = "string", name = "stockCode", value = "股票编码", required = true)
+    })
+    @ApiOperation(value = "获取指定股票指定T日每分钟交易数据", notes = "获取指定股票指定T日每分钟交易数据", httpMethod = "GET")
+    @GetMapping("/stock/screen/time-sharing")
+    public R<List<Stock4MinuteDomain>> getStockScreenTimeSharing(@RequestParam(value = "code",required = true) String stockCode){
+        return stockService.getStockScreenTimeSharing(stockCode);
+    }
+
+    /**
+     *  单个个股日K 数据查询 ，可以根据时间区间查询数日的K线数据
+     * @param stockCode 股票编码
+     * @return
+     */
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", dataType = "string", name = "stockCode", value = "股票编码", required = true)
+    })
+    @ApiOperation(value = "单个个股日K 数据查询 ，可以根据时间区间查询数日的K线数据", notes = "单个个股日K 数据查询 ，可以根据时间区间查询数日的K线数据", httpMethod = "GET")
+    @GetMapping("/stock/screen/dkline")
+    public R<List<Stock4EvrDayDomain>> getStockScreenDkLine(@RequestParam(value = "code",required = true) String stockCode){
+        return stockService.getStockScreenDkLine(stockCode);
+    }
 }
