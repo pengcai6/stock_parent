@@ -72,4 +72,29 @@ public interface StockRtInfoMapper {
      * @return
      */
     List<Stock4EvrDayDomain> getStock4DkLine(@Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("stockCode") String stockCode);
+
+    /**
+     * 查询指定股票在指定日期范围内的每天的最大时间；
+     *
+     * @param startDate 开始时间
+     * @param endDate 截止时间
+     * @param stockCode 股票编号
+     * @return
+     */
+    List<String> getStockMaxTime(@Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("stockCode") String stockCode);
+
+    /**
+     * 查询指定日期范围内指定股票每天的交易数据通过已有时间数据
+     * @param StockMaxTimes 最大时间数组
+     * @param stockCode 股票编号
+     * @return
+     */
+    List<Stock4EvrDayDomain> getStock4DkLineByMaxTime(@Param("StockMaxTimes") List<String> StockMaxTimes, @Param("stockCode") String stockCode);
+
+    /**
+     * 批量插入个股数据
+     * @param list
+     * @return
+     */
+    int insertBatch(@Param("list") List<StockRtInfo> list);
 }

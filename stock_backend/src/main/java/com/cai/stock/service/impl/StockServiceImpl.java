@@ -13,6 +13,7 @@ import com.cai.stock.vo.resp.PageResult;
 import com.cai.stock.vo.resp.R;
 import com.cai.stock.vo.resp.ResponseCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.benmanes.caffeine.cache.Cache;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import io.swagger.annotations.ApiModel;
@@ -47,21 +48,33 @@ public class StockServiceImpl implements StockService {
     private StockRtInfoMapper StockRtInfoMapper;
     @Autowired
     private StockRtInfoMapper stockRtInfoMapper;
+    //注入本地缓存bean
+    @Autowired
+    private Cache<String,Object> CaffeineCache;
 
+    /**
+     * 获取国内大盘最新的数据
+     * @return
+     */
     @Override
     public R<List<InnerMarketDomain>> getInnerMarketInfo() {
-        //1.获取股票交易的最新时间点（精确到分钟，秒和毫秒置为0）
+        //默认从本地缓存加载数据，如果不存在则从数据库 加载并同步到本地缓存
+        R<List<InnerMarketDomain>> result = (R<List<InnerMarketDomain>>) CaffeineCache.get("innerMarketKey", key -> {
+            //1.获取股票交易的最新时间点（精确到分钟，秒和毫秒置为0）
 //        DateTime curDateTime = DateTimeUtil.getLastDate4Stock(DateTime.now());
 //        Date curDate = curDateTime.toDate();
-        //由于没有采集数据，目前使用假数据调试
-        Date curDate = DateTimeUtil.getLastDate4Stock(DateTime.now()).toDate();
-        curDate = DateTime.parse("2022-07-07 14:51:00", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).toDate();
-        //2.获取大盘集合编码
-        List<String> mCodes = stockInfoConfig.getInner();
-        //3.调用mapper查询数据
-        List<InnerMarketDomain> data = stockMarketIndexInfoMapper.getMarketInfo(curDate, mCodes);
-        //4.封装并且返回数据
-        return R.ok(data);
+            //由于没有采集数据，目前使用假数据调试
+            Date curDate = DateTimeUtil.getLastDate4Stock(DateTime.now()).toDate();
+            curDate = DateTime.parse("2022-07-07 14:51:00", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).toDate();
+            //2.获取大盘集合编码
+            List<String> mCodes = stockInfoConfig.getInner();
+            //3.调用mapper查询数据
+            List<InnerMarketDomain> data = stockMarketIndexInfoMapper.getMarketInfo(curDate, mCodes);
+            //4.封装并且返回数据
+            return R.ok(data);
+        });
+
+        return result;
     }
     /**
      * 获取国外大盘最新的数据
@@ -98,7 +111,12 @@ public class StockServiceImpl implements StockService {
         startDate = DateTime.parse("2021-6-30 09:32:00", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).toDate();
 
         //2.调用Mapper接口获取指定日期范围内的日K线数据
-        List<Stock4EvrDayDomain> infos  =stockRtInfoMapper.getStock4DkLine(startDate,endDate,stockCode);
+       // List<Stock4EvrDayDomain> infos  =stockRtInfoMapper.getStock4DkLine(startDate,endDate,stockCode);
+        //拆分步骤
+        //第一步：查询指定股票在指定日期范围内的每天的最大时间；
+        List<String> stockMaxTime = stockRtInfoMapper.getStockMaxTime(startDate,endDate,stockCode);
+        //第二步：将第一步的结果作为条件查询对应的数据；
+        List<Stock4EvrDayDomain> infos = stockRtInfoMapper.getStock4DkLineByMaxTime(stockMaxTime, stockCode);
         //3.返回数据
         return R.ok(infos);
     }
@@ -112,7 +130,7 @@ public class StockServiceImpl implements StockService {
     public R<List<StockBlockDomain>> sectorAllLimit() {
         //由于没有采集数据，目前使用假数据调试
         Date curDate = DateTimeUtil.getLastDate4Stock(DateTime.now()).toDate();
-        curDate = DateTime.parse("2021-12-21 14:30:00", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).toDate();
+        curDate = DateTime.parse("2021-12-21 1  4:30:00", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).toDate();
         //调用mapper查询数据
         List<StockBlockDomain> data = stockBlockRtInfoMapper.sectorAllLimit(curDate);
         //组装数据
@@ -341,6 +359,8 @@ public class StockServiceImpl implements StockService {
        //4.返回数据
         return R.ok(data);
     }
+
+
 
 
 }

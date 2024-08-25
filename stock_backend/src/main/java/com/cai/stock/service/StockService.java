@@ -1,10 +1,10 @@
 package com.cai.stock.service;
-import cn.hutool.http.server.HttpServerResponse;
 import com.cai.stock.pojo.domain.*;
 import com.cai.stock.vo.resp.PageResult;
 import com.cai.stock.vo.resp.R;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -75,4 +75,6 @@ public interface StockService {
      * @return
      */
     R<List<Stock4EvrDayDomain>> getStockScreenDkLine(String stockCode);
+
+
 }

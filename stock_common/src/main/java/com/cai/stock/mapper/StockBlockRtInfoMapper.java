@@ -35,4 +35,10 @@ public interface StockBlockRtInfoMapper {
 
     int updateByPrimaryKey(StockBlockRtInfo record);
 
+    /**
+     * 板块信息批量插入
+     * @param list
+     * @return
+     */
+    int insertBatch(@Param("list") List<StockBlockRtInfo> list);
 }

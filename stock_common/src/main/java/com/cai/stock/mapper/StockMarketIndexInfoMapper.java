@@ -54,4 +54,11 @@ public interface StockMarketIndexInfoMapper {
      * @return
      */
     List<ExternalMarKetDomain> getMarketInfoByTimeAndPoint(@Param("curDate") Date curDate, @Param("marketCodes") List<String> mCodes);
+
+    /**
+     *  批量插入大盘数据
+     * @param entities
+     * @return
+     */
+    int insertBatch(@Param("infos") List<StockMarketIndexInfo> entities);
 }
