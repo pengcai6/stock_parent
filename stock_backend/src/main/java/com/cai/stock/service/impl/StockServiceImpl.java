@@ -3,6 +3,7 @@ package com.cai.stock.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import com.alibaba.excel.EasyExcel;
 import com.cai.stock.mapper.StockBlockRtInfoMapper;
+import com.cai.stock.mapper.StockBusinessMapper;
 import com.cai.stock.mapper.StockMarketIndexInfoMapper;
 import com.cai.stock.mapper.StockRtInfoMapper;
 import com.cai.stock.pojo.domain.*;
@@ -51,6 +52,8 @@ public class StockServiceImpl implements StockService {
     //注入本地缓存bean
     @Autowired
     private Cache<String,Object> CaffeineCache;
+    @Autowired
+    private StockBusinessMapper stockBusinessMapper;
 
     /**
      * 获取国内大盘最新的数据
@@ -119,6 +122,14 @@ public class StockServiceImpl implements StockService {
         List<Stock4EvrDayDomain> infos = stockRtInfoMapper.getStock4DkLineByMaxTime(stockMaxTime, stockCode);
         //3.返回数据
         return R.ok(infos);
+    }
+
+    @Override
+    public R<List<Map<String, String>>> getStockSearch(String stockCode) {
+       //1.通过Mapper接口调用方法模糊查询数据数据
+        List<Map<String, String>> result=  stockBusinessMapper.getStockBuinessByCode(stockCode);
+        //2.返回数据
+        return R.ok(result);
     }
 
     /**

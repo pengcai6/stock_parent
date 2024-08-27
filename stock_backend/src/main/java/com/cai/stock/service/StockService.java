@@ -4,7 +4,6 @@ import com.cai.stock.vo.resp.PageResult;
 import com.cai.stock.vo.resp.R;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -76,5 +75,10 @@ public interface StockService {
      */
     R<List<Stock4EvrDayDomain>> getStockScreenDkLine(String stockCode);
 
-
+    /**
+     *  根据输入的个股代码，进行模糊查询，返回证券代码和证券名称
+     * @param stockCode  个股代码
+     * @return
+     */
+    R<List<Map<String, String>>> getStockSearch(String stockCode);
 }

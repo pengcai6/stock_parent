@@ -159,4 +159,18 @@ public class StockController {
     public R<List<Stock4EvrDayDomain>> getStockScreenDkLine(@RequestParam(value = "code",required = true) String stockCode){
         return stockService.getStockScreenDkLine(stockCode);
     }
+
+    /**
+     *  根据输入的个股代码，进行模糊查询，返回证券代码和证券名称
+     * @param stockCode  个股代码
+     * @return
+     */
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", dataType = "string", name = "stockCode", value = "个股代码", required = true)
+    })
+    @ApiOperation(value = "根据输入的个股代码，进行模糊查询，返回证券代码和证券名称", notes = "根据输入的个股代码，进行模糊查询，返回证券代码和证券名称", httpMethod = "GET")
+    @GetMapping("/stock/search")
+    public R<List<Map<String,String>>>  getStockSearch(@RequestParam(value ="searchStr") String stockCode){
+        return stockService.getStockSearch(stockCode);
+    }
 }

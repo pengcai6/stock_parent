@@ -1,8 +1,11 @@
 package com.cai.stock.mapper;
 
 import com.cai.stock.pojo.entity.StockBusiness;
+import io.swagger.annotations.ApiModel;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
 * @author cai
@@ -10,6 +13,7 @@ import java.util.List;
 * @createDate 2024-08-16 15:51:51
 * @Entity com.cai.stock.pojo.entity.StockBusiness
 */
+@ApiModel(description = "针对表【stock_business(主营业务表)】的数据库操作Mapper")
 public interface StockBusinessMapper {
 
     int deleteByPrimaryKey(Long id);
@@ -29,4 +33,11 @@ public interface StockBusinessMapper {
      * @return
      */
     List<String> getAllStockCodes();
+
+    /**
+     * 根据输入的个股代码，进行模糊查询，返回证券代码和证券名称
+     * @param stockCode
+     * @return
+     */
+    List<Map<String, String>> getStockBuinessByCode(@Param("stockCode") String stockCode);
 }
