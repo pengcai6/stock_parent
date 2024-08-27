@@ -25,7 +25,6 @@ public class LoginRespVo {
      * 将Long类型数字进行json格式转化时，转成String格式类型
      */
     @ApiModelProperty(value = "用户ID")
-    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     /**
      * 电话

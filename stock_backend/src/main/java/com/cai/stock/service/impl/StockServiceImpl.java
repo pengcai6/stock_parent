@@ -130,7 +130,7 @@ public class StockServiceImpl implements StockService {
     public R<List<StockBlockDomain>> sectorAllLimit() {
         //由于没有采集数据，目前使用假数据调试
         Date curDate = DateTimeUtil.getLastDate4Stock(DateTime.now()).toDate();
-        curDate = DateTime.parse("2021-12-21 1  4:30:00", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).toDate();
+        curDate = DateTime.parse("2021-12-21 14:30:00", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).toDate();
         //调用mapper查询数据
         List<StockBlockDomain> data = stockBlockRtInfoMapper.sectorAllLimit(curDate);
         //组装数据

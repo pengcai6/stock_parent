@@ -26,6 +26,8 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true #开启驼峰映射
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #通过mybatis执行的sql以日志的形式输出到终端
+    local-cache-scope: statement
+    cache-enabled: false #禁用二级缓存
 #配置分页插件
 pagehelper:
   helper-dialect: mysql #配置分页的方言(数据库类型)
