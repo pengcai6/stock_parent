@@ -132,6 +132,17 @@ public class StockServiceImpl implements StockService {
         return R.ok(result);
     }
 
+    @Override
+    public R<Map<String, String>> getStockDescribe(String stockCode) {
+        //1.通过Mapper接口调用方法查询个股信息数据
+       Map<String, String> data= stockBusinessMapper.getStockDescribeByCode(stockCode);
+        //组装数据
+        if (CollectionUtil.isEmpty(data)) {
+            return R.error(ResponseCode.NO_RESPONSE_DATA.getMessage());
+        }
+        return R.ok(data);
+    }
+
     /**
      * 需求说明: 沪深两市板块分时行情数据查询，以交易时间和交易总金额降序查询，取前10条数据
      *

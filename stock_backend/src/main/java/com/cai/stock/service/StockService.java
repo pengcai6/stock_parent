@@ -81,4 +81,10 @@ public interface StockService {
      * @return
      */
     R<List<Map<String, String>>> getStockSearch(String stockCode);
+    /**
+     * 个股主营业务查询
+     * @param stockCode 个股代码
+     * @return
+     */
+    R<Map<String, String>> getStockDescribe(String stockCode);
 }

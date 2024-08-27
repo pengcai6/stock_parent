@@ -36,8 +36,15 @@ public interface StockBusinessMapper {
 
     /**
      * 根据输入的个股代码，进行模糊查询，返回证券代码和证券名称
-     * @param stockCode
+     * @param stockCode 个股代码
      * @return
      */
     List<Map<String, String>> getStockBuinessByCode(@Param("stockCode") String stockCode);
+
+    /**
+     * 根据输入的个股代码，查询个股信息
+     * @param stockCode  个股代码
+     * @return
+     */
+    Map<String, String> getStockDescribeByCode(@Param("stockCode") String stockCode);
 }

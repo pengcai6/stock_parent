@@ -173,4 +173,20 @@ public class StockController {
     public R<List<Map<String,String>>>  getStockSearch(@RequestParam(value ="searchStr") String stockCode){
         return stockService.getStockSearch(stockCode);
     }
+
+    /**
+     * 个股主营业务查询
+     * @param stockCode 个股代码
+     * @return
+     */
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", dataType = "string", name = "stockCode", value = "个股代码", required = true)
+    })
+    @ApiOperation(value = "个股主营业务查询", notes = "个股主营业务查询", httpMethod = "GET")
+    @GetMapping("/stock/describe")
+    public R<Map<String,String>> getStockDescribe(@RequestParam(value = "code") String stockCode)
+    {
+        return stockService.getStockDescribe(stockCode);
+    }
+
 }
