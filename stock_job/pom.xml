@@ -47,6 +47,11 @@
 <!--            <artifactId>jackson-dataformat-xml</artifactId>-->
 <!--&lt;!&ndash;            <version>2.9.10</version>&ndash;&gt;-->
 <!--        </dependency>-->
+        <!-- xxl-job-core -->
+        <dependency>
+            <groupId>com.xuxueli</groupId>
+            <artifactId>xxl-job-core</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
