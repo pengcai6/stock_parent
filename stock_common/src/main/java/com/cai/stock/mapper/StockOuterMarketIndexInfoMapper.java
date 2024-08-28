@@ -1,6 +1,9 @@
 package com.cai.stock.mapper;
 
 import com.cai.stock.pojo.entity.StockOuterMarketIndexInfo;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
 * @author cai
@@ -22,4 +25,10 @@ public interface StockOuterMarketIndexInfoMapper {
 
     int updateByPrimaryKey(StockOuterMarketIndexInfo record);
 
+    /**
+     * 国外大盘信息批量插入
+     * @param list
+     * @return
+     */
+    int insertBatch(@Param("list") List<StockOuterMarketIndexInfo> list);
 }

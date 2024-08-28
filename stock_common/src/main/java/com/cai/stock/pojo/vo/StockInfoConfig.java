@@ -4,8 +4,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -22,13 +20,13 @@ public class StockInfoConfig {
     /**
      * 封装国内A股大盘编码集合
      */
-   @ApiModelProperty("封装国内A股大盘编码集合")
-   private   List<String> inner;
+    @ApiModelProperty("封装国内A股大盘编码集合")
+    private List<String> inner;
     /**
      * 外盘编码集合
      */
     @ApiModelProperty("外盘编码集合")
-    private  List<String> outer;
+    private List<String> outer;
     /**
      * 股票涨幅区间标题
      */
@@ -45,5 +43,10 @@ public class StockInfoConfig {
      * 板块采集URL
      */
     @ApiModelProperty("板块采集URL")
-    private String  blockUrl;
- }
+    private String blockUrl;
+    /**
+     * 国外大盘数据采集URL
+     */
+    @ApiModelProperty("国外大盘数据采集URL")
+    private String outerMarketUrl;
+}

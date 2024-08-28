@@ -132,6 +132,7 @@ public class ParserStockInfoUtil {
         Date now=DateTimeUtil.getDateTimeWithoutSecond(DateTime.now()).toDate();
         //组装实体对象
         StockOuterMarketIndexInfo smi = StockOuterMarketIndexInfo.builder()
+                .marketName(marketName)
                 .id(idWorker.nextId())
                 .marketCode(marketCode)
                 .curPoint(curPoint)
@@ -230,4 +231,6 @@ public class ParserStockInfoUtil {
         }).collect(Collectors.toList());
         return collect;
     }
+
+
 }

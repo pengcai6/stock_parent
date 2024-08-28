@@ -20,4 +20,12 @@ public class TestRestTemplate {
     public void test03() throws InterruptedException {
         stockTimerTaskService.getStockSectorRtIndex();
     }
+    @Test
+    public void test04() throws InterruptedException {
+        stockTimerTaskService.getOuterRtInfo();
+        //目的，让主线程休眠
+        Thread.sleep(5000);
+    }
+
+
 }

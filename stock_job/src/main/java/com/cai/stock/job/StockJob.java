@@ -36,5 +36,12 @@ public class StockJob {
     public void getStockRtInfo(){
         stockTimerTaskService.getStockRtInfo();
     }
+    /**
+     * 定时采集国外大盘数据
+     */
+    @XxlJob("getOuterRtInfo")
+    public void getOuterRtInfo(){
+        stockTimerTaskService.getOuterRtInfo();
+    }
 
 }

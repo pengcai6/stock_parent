@@ -1,12 +1,10 @@
 package com.cai.stock.service.impl;
 
 import com.cai.stock.constant.ParseType;
-import com.cai.stock.mapper.StockBlockRtInfoMapper;
-import com.cai.stock.mapper.StockBusinessMapper;
-import com.cai.stock.mapper.StockMarketIndexInfoMapper;
-import com.cai.stock.mapper.StockRtInfoMapper;
+import com.cai.stock.mapper.*;
 import com.cai.stock.pojo.entity.StockBlockRtInfo;
 import com.cai.stock.pojo.entity.StockMarketIndexInfo;
+import com.cai.stock.pojo.entity.StockOuterMarketIndexInfo;
 import com.cai.stock.pojo.entity.StockRtInfo;
 import com.cai.stock.pojo.vo.StockInfoConfig;
 import com.cai.stock.service.StockTimerTaskService;
@@ -62,6 +60,8 @@ public class StockTimerTaskServiceImpl implements StockTimerTaskService {
     必须保证该对象初始化无状态
      */
     private HttpEntity<Object> entity;
+    @Autowired
+    private StockOuterMarketIndexInfoMapper stockOuterMarketIndexInfoMapper;
 
     @Override
     public void getInnerMarketInfo() {
@@ -292,6 +292,37 @@ public class StockTimerTaskServiceImpl implements StockTimerTaskService {
                         log.info("当前时间:{},插入板块数据:{}成功", DateTime.now().toString("yyyy-MM-dd HH:mm:ss"), info);
                     } else {
                         log.info("当前时间:{},插入板块数据:{}失败", DateTime.now().toString("yyyy-MM-dd HH:mm:ss"), info);
+                    }
+                }
+        );
+    }
+
+    @Override
+    public void getOuterRtInfo() {
+         //1.获取国外大盘数据采集URL
+        String url = stockInfoConfig.getOuterMarketUrl();
+        //2.发起请求
+        ResponseEntity<String> responseEntity = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+        //出现异常操作
+        int statusCodeValue = responseEntity.getStatusCodeValue();
+        if (statusCodeValue != 200) {
+            log.error("当前时间点：{}，采集数据失败，http状态码：{}", DateTime.now().toString("yyyy-MM-dd HH:mm:ss"), statusCodeValue);
+            //其它操作
+            return;
+        }
+        //获取原始js数据
+        String jsData = responseEntity.getBody();
+        //调用工具类解析数据
+        List<StockOuterMarketIndexInfo> list = parserStockInfoUtil.parser4StockOrMarketInfo(jsData, ParseType.OUTER);
+        log.info("采集国外大盘数据：{}", list);
+        //4.TODO:批量插入
+        Lists.partition(list, 20).forEach(
+                info -> {
+                    int count = stockOuterMarketIndexInfoMapper.insertBatch(list);
+                    if (count > 0) {
+                        log.info("当前时间:{},插入国外大盘数据:{}成功", DateTime.now().toString("yyyy-MM-dd HH:mm:ss"), info);
+                    } else {
+                        log.info("当前时间:{},插入国外大盘数据:{}失败", DateTime.now().toString("yyyy-MM-dd HH:mm:ss"), info);
                     }
                 }
         );

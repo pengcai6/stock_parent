@@ -11,6 +11,7 @@ stock:
     - b_FSSTI # 新加坡
   marketUrl: https://hq.sinajs.cn/list=
   blockUrl: http://vip.stock.finance.sina.com.cn/q/view/newSinaHy.php
+  outerMarketUrl: http://hq.sinajs.cn/list=int_dji,int_nasdaq,int_hangseng,int_nikkei,b_FSSTI
 # 定时任务线程池基础参数
 task:
   pool:
