@@ -204,6 +204,18 @@
         where cur_time &lt;= #{Date}
           AND stock_code = #{stockCode} order by cur_time desc limit 1
     </select>
+    <select id="getStockRtInfo" resultType="com.cai.stock.pojo.entity.StockRt">
+        select trade_amount as tradeAmt,
+               pre_close_price as preClosePrice,
+               min_price as lowPrice,
+               max_price as highPrice,
+               open_price as openPrice,
+               trade_volume as tradeVol,
+               cur_price as tradePrice,
+               cur_time as curDate
+        from stock_rt_info
+        where cur_time=#{curDate} and stock_code =#{stockCode};
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from stock_rt_info

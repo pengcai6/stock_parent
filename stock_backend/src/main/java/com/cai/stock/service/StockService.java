@@ -2,6 +2,7 @@ package com.cai.stock.service;
 import com.cai.stock.pojo.domain.*;
 import com.cai.stock.vo.resp.PageResult;
 import com.cai.stock.vo.resp.R;
+import com.cai.stock.pojo.entity.StockRt;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -93,4 +94,12 @@ public interface StockService {
      * @return
      */
     R<List<Stock4EvrWeekDomain>> getStockScreenWkLine(String stockCode);
+    /**
+     * 获取个股最新分时行情数据，主要包含：
+     * 开盘价、前收盘价、最新价、最高价、最低价、成交金额和成交量、交易时间信息;
+     *
+     * @param stockCode 股票编码
+     * @return
+     */
+    R<StockRt> getStockRtInfoNow(String stockCode);
 }

@@ -4,6 +4,7 @@ import com.cai.stock.pojo.domain.*;
 import com.cai.stock.service.StockService;
 import com.cai.stock.vo.resp.PageResult;
 import com.cai.stock.vo.resp.R;
+import com.cai.stock.pojo.entity.StockRt;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -198,6 +199,21 @@ public class StockController {
     public R<Map<String,String>> getStockDescribe(@RequestParam(value = "code") String stockCode)
     {
         return stockService.getStockDescribe(stockCode);
+    }
+
+    /**
+     * 获取个股最新分时行情数据，主要包含：
+     * 开盘价、前收盘价、最新价、最高价、最低价、成交金额和成交量、交易时间信息;
+     * @param stockCode 股票编码
+     * @return
+     */
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", dataType = "string", name = "stockCode", value = "股票编码", required = true)
+    })
+    @ApiOperation(value = "获取个股最新分时行情数据，主要包含： 开盘价、前收盘价、最新价、最高价、最低价、成交金额和成交量、交易时间信息;", notes = "获取个股最新分时行情数据，主要包含： 开盘价、前收盘价、最新价、最高价、最低价、成交金额和成交量、交易时间信息;", httpMethod = "GET")
+    @GetMapping("/stock/screen/second/detail")
+    public R<StockRt> getStockRtInfoNow(@RequestParam(value = "code") String stockCode){
+        return stockService.getStockRtInfoNow(stockCode);
     }
 
 }

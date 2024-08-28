@@ -4,6 +4,7 @@ import com.cai.stock.pojo.domain.Stock4EvrDayDomain;
 import com.cai.stock.pojo.domain.Stock4EvrWeekDomain;
 import com.cai.stock.pojo.domain.Stock4MinuteDomain;
 import com.cai.stock.pojo.domain.StockUpdownDomain;
+import com.cai.stock.pojo.entity.StockRt;
 import com.cai.stock.pojo.entity.StockRtInfo;
 import io.swagger.annotations.ApiModel;
 import org.apache.ibatis.annotations.Param;
@@ -121,17 +122,25 @@ public interface StockRtInfoMapper {
     /**
      * 获取给定时间的开盘价
      *
-     * @param Date
-     * @param stockCode
+     * @param Date 时间
+     * @param stockCode 股票代码
      * @return
      */
     BigDecimal getStockOpenPrice(@Param("Date") Date Date, @Param("stockCode") String stockCode);
 
     /**
      * 获取给定时间的收盘价
-     * @param Date
-     * @param stockCode
+     * @param Date 时间
+     * @param stockCode 股票代码
      * @return
      */
     BigDecimal getStockClosePrice(@Param("Date") Date Date, @Param("stockCode") String stockCode);
+
+    /**
+     * 获取个股最新分时行情数据
+     * @param stockCode  股票代码
+     * @param curDate  时间
+     * @return
+     */
+    StockRt getStockRtInfo(@Param("stockCode") String stockCode, @Param("curDate") Date curDate);
 }

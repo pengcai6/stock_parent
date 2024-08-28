@@ -13,6 +13,7 @@ import com.cai.stock.utils.DateTimeUtil;
 import com.cai.stock.vo.resp.PageResult;
 import com.cai.stock.vo.resp.R;
 import com.cai.stock.vo.resp.ResponseCode;
+import com.cai.stock.pojo.entity.StockRt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.pagehelper.PageHelper;
@@ -22,7 +23,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.CollectionUtils;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
 import org.joda.time.format.DateTimeFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
-import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -54,12 +53,13 @@ public class StockServiceImpl implements StockService {
     private StockRtInfoMapper stockRtInfoMapper;
     //注入本地缓存bean
     @Autowired
-    private Cache<String,Object> CaffeineCache;
+    private Cache<String, Object> CaffeineCache;
     @Autowired
     private StockBusinessMapper stockBusinessMapper;
 
     /**
      * 获取国内大盘最新的数据
+     *
      * @return
      */
     @Override
@@ -82,8 +82,10 @@ public class StockServiceImpl implements StockService {
 
         return result;
     }
+
     /**
      * 获取国外大盘最新的数据
+     *
      * @return
      */
     @Override
@@ -94,14 +96,16 @@ public class StockServiceImpl implements StockService {
         //2.获取大盘集合编码
         List<String> mCodes = stockInfoConfig.getOuter();
         //3.调用mapper查询数据,根据时间和大盘点数降序排序取前4
-        Integer PageSize=4;
-        PageHelper.startPage(1,PageSize);
+        Integer PageSize = 4;
+        PageHelper.startPage(1, PageSize);
         List<ExternalMarKetDomain> data = stockMarketIndexInfoMapper.getMarketInfoByTimeAndPoint(curDate, mCodes);
         //4.封装并且返回数据
         return R.ok(data);
     }
+
     /**
-     *  单个个股日K 数据查询 ，可以根据时间区间查询数日的K线数据
+     * 单个个股日K 数据查询 ，可以根据时间区间查询数日的K线数据
+     *
      * @param stockCode 股票编码
      * @return
      */
@@ -117,17 +121,19 @@ public class StockServiceImpl implements StockService {
         startDate = DateTime.parse("2021-6-30 09:32:00", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).toDate();
 
         //2.调用Mapper接口获取指定日期范围内的日K线数据
-       // List<Stock4EvrDayDomain> infos  =stockRtInfoMapper.getStock4DkLine(startDate,endDate,stockCode);
+        // List<Stock4EvrDayDomain> infos  =stockRtInfoMapper.getStock4DkLine(startDate,endDate,stockCode);
         //拆分步骤
         //第一步：查询指定股票在指定日期范围内的每天的最大时间；
-        List<String> stockMaxTime = stockRtInfoMapper.getStockMaxTime(startDate,endDate,stockCode);
+        List<String> stockMaxTime = stockRtInfoMapper.getStockMaxTime(startDate, endDate, stockCode);
         //第二步：将第一步的结果作为条件查询对应的数据；
         List<Stock4EvrDayDomain> infos = stockRtInfoMapper.getStock4DkLineByMaxTime(stockMaxTime, stockCode);
         //3.返回数据
         return R.ok(infos);
     }
+
     /**
-     *  单个个股周K 数据查询 ，可以根据时间区间查询数周的K线数据
+     * 单个个股周K 数据查询 ，可以根据时间区间查询数周的K线数据
+     *
      * @param stockCode 股票编码
      * @return
      */
@@ -143,46 +149,63 @@ public class StockServiceImpl implements StockService {
         startDate = DateTime.parse("2021-6-30 09:32:00", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).toDate();
 
         //2.调用Mapper接口获取指定日期范围内的周K线数据
-                //拆分步骤
+        //拆分步骤
         //第一步：查询指定股票在指定日期范围内的每天的最大时间；
-        List<String> stockMaxTime = stockRtInfoMapper.getStockMaxWeekTime(startDate,endDate,stockCode);
-        List<Stock4EvrWeekDomain> data=new ArrayList<>();
+        List<String> stockMaxTime = stockRtInfoMapper.getStockMaxWeekTime(startDate, endDate, stockCode);
+        List<Stock4EvrWeekDomain> data = new ArrayList<>();
         try {
-            for (String  WeekMaxTime: stockMaxTime) {
+            for (String WeekMaxTime : stockMaxTime) {
                 //转为日期格式的星期最后一天
                 DateTime WeekEndDateTime = DateTime.parse(WeekMaxTime, DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"));
                 Date WeekEndDate = WeekEndDateTime.toDate();
                 //获取周一的开盘时间
                 DateTime WeekStartDateTime = WeekEndDateTime.withDayOfWeek(1).withHourOfDay(9).withMinuteOfHour(30).withSecondOfMinute(0).withMillisOfSecond(0);
                 Date WeekStartDate = WeekStartDateTime.toDate();
-               Stock4EvrWeekDomain  weekDomain=stockRtInfoMapper.getStock4WkLineByMaxTime(WeekStartDate,WeekEndDate,stockCode);
-               //获取周一的开盘价
-                BigDecimal OpenPrice=  stockRtInfoMapper.getStockOpenPrice(WeekStartDate,stockCode);
+                Stock4EvrWeekDomain weekDomain = stockRtInfoMapper.getStock4WkLineByMaxTime(WeekStartDate, WeekEndDate, stockCode);
+                //获取周一的开盘价
+                BigDecimal OpenPrice = stockRtInfoMapper.getStockOpenPrice(WeekStartDate, stockCode);
                 //设置周一开盘价
                 weekDomain.setOpenPrice(OpenPrice);
                 //获取周五收盘价（如果当前日期不到周五，则显示最新价格）
-                BigDecimal ClosePrice=null;
-    //                if(week> DateTimeConstants.FRIDAY){
-    //                    DateTime previousTradingDay = DateTimeUtil.getPreviousTradingDay(WeekEndDateTime);
-    //                    Date closeDate = DateTimeUtil.getCloseDate(previousTradingDay).toDate();
-    //                    ClosePrice=stockRtInfoMapper.getStockClosePrice(closeDate,stockCode);
-    //                }
-    //                else {
-                      ClosePrice=stockRtInfoMapper.getStockClosePrice(WeekEndDate,stockCode);
+                BigDecimal ClosePrice = null;
+                //                if(week> DateTimeConstants.FRIDAY){
+                //                    DateTime previousTradingDay = DateTimeUtil.getPreviousTradingDay(WeekEndDateTime);
+                //                    Date closeDate = DateTimeUtil.getCloseDate(previousTradingDay).toDate();
+                //                    ClosePrice=stockRtInfoMapper.getStockClosePrice(closeDate,stockCode);
+                //                }
+                //                else {
+                ClosePrice = stockRtInfoMapper.getStockClosePrice(WeekEndDate, stockCode);
                 weekDomain.setClosePrice(ClosePrice);
-                    data.add(weekDomain);
+                data.add(weekDomain);
             }
         } catch (Exception e) {
-           log.error(e);
+            log.error(e);
         }
         //3.返回数据
         return R.ok(data);
     }
 
     @Override
+    public R<StockRt> getStockRtInfoNow(String stockCode) {
+        //1.获取股票最新交易时间点
+        Date curDate = DateTimeUtil.getLastDate4Stock(DateTime.now()).toDate();
+        //2.伪造数据
+       DateTime curDateTime = DateTime.parse("2021-12-30 09:33:00", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"));
+        //3.如果当前日期不在股票交易时间内，则查询最近的股票交易时间的数据回显
+        curDate = DateTimeUtil.getLastDate4Stock(curDateTime).toDate();
+        //3.调用Mapper接口中的方法查询数据
+        StockRt data = stockRtInfoMapper.getStockRtInfo(stockCode, curDate);
+        if (data == null) {
+            return R.error(ResponseCode.NO_RESPONSE_DATA);
+        }
+        //4.返回数据
+        return R.ok(data);
+    }
+
+    @Override
     public R<List<Map<String, String>>> getStockSearch(String stockCode) {
-       //1.通过Mapper接口调用方法模糊查询数据数据
-        List<Map<String, String>> result=  stockBusinessMapper.getStockBuinessByCode(stockCode);
+        //1.通过Mapper接口调用方法模糊查询数据数据
+        List<Map<String, String>> result = stockBusinessMapper.getStockBuinessByCode(stockCode);
         //2.返回数据
         return R.ok(result);
     }
@@ -190,7 +213,7 @@ public class StockServiceImpl implements StockService {
     @Override
     public R<Map<String, String>> getStockDescribe(String stockCode) {
         //1.通过Mapper接口调用方法查询个股信息数据
-       Map<String, String> data= stockBusinessMapper.getStockDescribeByCode(stockCode);
+        Map<String, String> data = stockBusinessMapper.getStockDescribeByCode(stockCode);
         //组装数据
         if (CollectionUtil.isEmpty(data)) {
             return R.error(ResponseCode.NO_RESPONSE_DATA.getMessage());
@@ -428,16 +451,14 @@ public class StockServiceImpl implements StockService {
         //2.获取开盘时间
         Date openDate = DateTimeUtil.getOpenDate(endDateTime).toDate();
         //3.调用mapper接口查询
-       List<Stock4MinuteDomain> data = stockRtInfoMapper.getStockInfo4Minute(openDate,endDate,stockCode);
+        List<Stock4MinuteDomain> data = stockRtInfoMapper.getStockInfo4Minute(openDate, endDate, stockCode);
         //判断非空处理
         if (CollectionUtils.isEmpty(data)) {
-            data=new ArrayList<>();
+            data = new ArrayList<>();
         }
-       //4.返回数据
+        //4.返回数据
         return R.ok(data);
     }
-
-
 
 
 }
