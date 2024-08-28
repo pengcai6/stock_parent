@@ -129,19 +129,16 @@
     </select>
     <select id="getStock4DkLine" resultType="com.cai.stock.pojo.domain.Stock4EvrDayDomain">
 
-        select
-
-
-            sri.cur_time as date,
-            sri.trade_amount as tradeAmt,
-            sri.stock_code as code,
-            sri.min_price as lowPrice,
-            sri.stock_name as name,
-            sri.max_price as highPrice,
-            sri.open_price as openPrice,
-            sri.trade_volume as tradeVol,
-            sri.cur_price as closePrice,
-            sri.pre_close_price as preClosePrice
+        select sri.cur_time        as date,
+               sri.trade_amount    as tradeAmt,
+               sri.stock_code      as code,
+               sri.min_price       as lowPrice,
+               sri.stock_name      as name,
+               sri.max_price       as highPrice,
+               sri.open_price      as openPrice,
+               sri.trade_volume    as tradeVol,
+               sri.cur_price       as closePrice,
+               sri.pre_close_price as preClosePrice
         from stock_rt_info as sri
         where stock_code = '600016'
           and cur_time in (select max(cur_time) as mxTime
@@ -171,11 +168,41 @@
             sri.cur_price as closePrice,
             sri.pre_close_price as preClosePrice
         from stock_rt_info as sri
-        where stock_code = '600016'
+        where stock_code = #{stockCode}
           and cur_time in 
         <foreach collection="StockMaxTimes" item="StockMaxTime" open="(" close=")" separator=",">
             #{StockMaxTime}
         </foreach> group by date
+    </select>
+    <select id="getStockMaxWeekTime" resultType="java.lang.String">
+        select max(cur_time) as mxTime
+        from stock_rt_info
+        where cur_time between #{startDate} and #{endDate}
+          AND stock_code = #{stockCode}
+        GROUP BY DATE_FORMAT(cur_time, '%u')
+    </select>
+    <select id="getStock4WkLineByMaxTime" resultType="com.cai.stock.pojo.domain.Stock4EvrWeekDomain">
+        select stock_code as stockCode,
+               max(cur_time) as mxTime,
+               avg(cur_price) as avgPrice,
+               min(min_price) as minPrice,
+               max(max_price) as maxPrice
+        from stock_rt_info
+        where cur_time between #{weekStartDate} and #{weekEndDate}
+          AND stock_code = #{stockCode}
+        GROUP BY DATE_FORMAT(cur_time, '%u')
+    </select>
+    <select id="getStockOpenPrice" resultType="java.math.BigDecimal">
+        select  open_price
+        from stock_rt_info
+        where cur_time >= #{Date}
+          AND stock_code = #{stockCode} order by cur_time limit 1
+    </select>
+    <select id="getStockClosePrice" resultType="java.math.BigDecimal">
+        select  cur_price
+        from stock_rt_info
+        where cur_time &lt;= #{Date}
+          AND stock_code = #{stockCode} order by cur_time desc limit 1
     </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">

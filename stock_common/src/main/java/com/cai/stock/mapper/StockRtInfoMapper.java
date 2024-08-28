@@ -1,12 +1,14 @@
 package com.cai.stock.mapper;
 
 import com.cai.stock.pojo.domain.Stock4EvrDayDomain;
+import com.cai.stock.pojo.domain.Stock4EvrWeekDomain;
 import com.cai.stock.pojo.domain.Stock4MinuteDomain;
 import com.cai.stock.pojo.domain.StockUpdownDomain;
 import com.cai.stock.pojo.entity.StockRtInfo;
 import io.swagger.annotations.ApiModel;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -97,4 +99,39 @@ public interface StockRtInfoMapper {
      * @return
      */
     int insertBatch(@Param("list") List<StockRtInfo> list);
+
+    /**
+     * 查询指定股票在指定日期范围内的每周的最大时间；
+     * @param startDate
+     * @param endDate
+     * @param stockCode
+     * @return
+     */
+    List<String> getStockMaxWeekTime(@Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("stockCode") String stockCode);
+
+    /**
+     * 个个股周K 数据查询 ，可以根据时间区间查询数周的K线数据
+     * @param weekStartDate 周开始时间
+     * @param weekEndDate 周结束时间
+     * @param stockCode 股票编号
+     * @return
+     */
+    Stock4EvrWeekDomain getStock4WkLineByMaxTime(@Param("weekStartDate") Date weekStartDate, @Param("weekEndDate") Date weekEndDate, @Param("stockCode") String stockCode);
+
+    /**
+     * 获取给定时间的开盘价
+     *
+     * @param Date
+     * @param stockCode
+     * @return
+     */
+    BigDecimal getStockOpenPrice(@Param("Date") Date Date, @Param("stockCode") String stockCode);
+
+    /**
+     * 获取给定时间的收盘价
+     * @param Date
+     * @param stockCode
+     * @return
+     */
+    BigDecimal getStockClosePrice(@Param("Date") Date Date, @Param("stockCode") String stockCode);
 }

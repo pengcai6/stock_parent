@@ -87,4 +87,10 @@ public interface StockService {
      * @return
      */
     R<Map<String, String>> getStockDescribe(String stockCode);
+    /**
+     *  单个个股周K 数据查询 ，可以根据时间区间查询数周的K线数据
+     * @param stockCode 股票编码
+     * @return
+     */
+    R<List<Stock4EvrWeekDomain>> getStockScreenWkLine(String stockCode);
 }

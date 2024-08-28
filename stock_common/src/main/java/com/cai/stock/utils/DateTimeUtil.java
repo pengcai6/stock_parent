@@ -3,6 +3,9 @@ package com.cai.stock.utils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  * @author by itheima
  * @Date 2021/12/31
@@ -161,4 +164,5 @@ public class DateTimeUtil {
         DateTime parse = DateTime.parse(dateTime, DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"));
         return getDateTimeWithoutSecond(parse);
     }
+
 }

@@ -1,7 +1,5 @@
 package com.cai.stock.controller;
 
-import cn.hutool.http.server.HttpServerResponse;
-import com.cai.stock.mapper.StockRtInfoMapper;
 import com.cai.stock.pojo.domain.*;
 import com.cai.stock.service.StockService;
 import com.cai.stock.vo.resp.PageResult;
@@ -11,7 +9,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -123,7 +120,7 @@ public class StockController {
     }
 
     /**
-     * 统计当前时间下（精确到分钟），A股在各个涨跌区间股票的数量
+     * 统计当前时间下（精确到分钟），A股在各个涨跌区间的股票的数量
      * @return
      */
     @ApiOperation(value = "统计当前时间下（精确到分钟），A股在各个涨跌区间股票的数量", notes = "统计当前时间下（精确到分钟），A股在各个涨跌区间股票的数量", httpMethod = "GET")
@@ -158,6 +155,20 @@ public class StockController {
     @GetMapping("/stock/screen/dkline")
     public R<List<Stock4EvrDayDomain>> getStockScreenDkLine(@RequestParam(value = "code",required = true) String stockCode){
         return stockService.getStockScreenDkLine(stockCode);
+    }
+
+    /**
+     *  单个个股周K 数据查询 ，可以根据时间区间查询数周的K线数据
+     * @param stockCode 股票编码
+     * @return
+     */
+      @ApiImplicitParams({
+              @ApiImplicitParam(paramType = "query", dataType = "string", name = "stockCode", value = "股票编码", required = true)
+      })
+      @ApiOperation(value = "单个个股周K 数据查询 ，可以根据时间区间查询数周的K线数据", notes = "单个个股周K 数据查询 ，可以根据时间区间查询数周的K线数据", httpMethod = "GET")
+      @GetMapping("/stock/screen/weekkline")
+    public R<List<Stock4EvrWeekDomain>> getStockScreenWkLine(@RequestParam(value = "code",required = true) String stockCode){
+        return stockService.getStockScreenWkLine(stockCode);
     }
 
     /**

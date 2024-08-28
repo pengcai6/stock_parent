@@ -22,13 +22,16 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.CollectionUtils;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
 import org.joda.time.format.DateTimeFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -122,6 +125,58 @@ public class StockServiceImpl implements StockService {
         List<Stock4EvrDayDomain> infos = stockRtInfoMapper.getStock4DkLineByMaxTime(stockMaxTime, stockCode);
         //3.返回数据
         return R.ok(infos);
+    }
+    /**
+     *  单个个股周K 数据查询 ，可以根据时间区间查询数周的K线数据
+     * @param stockCode 股票编码
+     * @return
+     */
+    @Override
+    public R<List<Stock4EvrWeekDomain>> getStockScreenWkLine(String stockCode) {
+        //1.获取统计日K线的数据的时间范围
+        //1.1获取截止时间
+        DateTime endDateTime = DateTimeUtil.getLastDate4Stock(DateTime.now());
+        endDateTime = DateTime.parse("2021-12-30 09:32:00", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"));
+        Date endDate = endDateTime.toDate();
+        //1.2起始时间
+        Date startDate = endDateTime.minusMonths(3).toDate();
+        startDate = DateTime.parse("2021-6-30 09:32:00", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).toDate();
+
+        //2.调用Mapper接口获取指定日期范围内的周K线数据
+                //拆分步骤
+        //第一步：查询指定股票在指定日期范围内的每天的最大时间；
+        List<String> stockMaxTime = stockRtInfoMapper.getStockMaxWeekTime(startDate,endDate,stockCode);
+        List<Stock4EvrWeekDomain> data=new ArrayList<>();
+        try {
+            for (String  WeekMaxTime: stockMaxTime) {
+                //转为日期格式的星期最后一天
+                DateTime WeekEndDateTime = DateTime.parse(WeekMaxTime, DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"));
+                Date WeekEndDate = WeekEndDateTime.toDate();
+                //获取周一的开盘时间
+                DateTime WeekStartDateTime = WeekEndDateTime.withDayOfWeek(1).withHourOfDay(9).withMinuteOfHour(30).withSecondOfMinute(0).withMillisOfSecond(0);
+                Date WeekStartDate = WeekStartDateTime.toDate();
+               Stock4EvrWeekDomain  weekDomain=stockRtInfoMapper.getStock4WkLineByMaxTime(WeekStartDate,WeekEndDate,stockCode);
+               //获取周一的开盘价
+                BigDecimal OpenPrice=  stockRtInfoMapper.getStockOpenPrice(WeekStartDate,stockCode);
+                //设置周一开盘价
+                weekDomain.setOpenPrice(OpenPrice);
+                //获取周五收盘价（如果当前日期不到周五，则显示最新价格）
+                BigDecimal ClosePrice=null;
+    //                if(week> DateTimeConstants.FRIDAY){
+    //                    DateTime previousTradingDay = DateTimeUtil.getPreviousTradingDay(WeekEndDateTime);
+    //                    Date closeDate = DateTimeUtil.getCloseDate(previousTradingDay).toDate();
+    //                    ClosePrice=stockRtInfoMapper.getStockClosePrice(closeDate,stockCode);
+    //                }
+    //                else {
+                      ClosePrice=stockRtInfoMapper.getStockClosePrice(WeekEndDate,stockCode);
+                weekDomain.setClosePrice(ClosePrice);
+                    data.add(weekDomain);
+            }
+        } catch (Exception e) {
+           log.error(e);
+        }
+        //3.返回数据
+        return R.ok(data);
     }
 
     @Override
