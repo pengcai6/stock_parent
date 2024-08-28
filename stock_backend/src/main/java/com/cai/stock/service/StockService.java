@@ -102,4 +102,10 @@ public interface StockService {
      * @return
      */
     R<StockRt> getStockRtInfoNow(String stockCode);
+    /**
+     * 个股交易流水行情数据查询--查询最新交易流水，按照交易时间降序取前10
+     * @param stockCode 股票编码
+     * @return
+     */
+    R<List<Map<String, Object>>> getStockStatement(String stockCode);
 }

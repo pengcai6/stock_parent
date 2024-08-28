@@ -26,6 +26,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -199,6 +200,14 @@ public class StockServiceImpl implements StockService {
             return R.error(ResponseCode.NO_RESPONSE_DATA);
         }
         //4.返回数据
+        return R.ok(data);
+    }
+
+    @Override
+    public R<List<Map<String, Object>>> getStockStatement(String stockCode) {
+        //1.调用Mapper接口查询
+        List<Map<String, Object>> data= stockRtInfoMapper.getStockStatement(stockCode);
+        //2.返回数据
         return R.ok(data);
     }
 

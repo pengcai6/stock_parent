@@ -143,4 +143,11 @@ public interface StockRtInfoMapper {
      * @return
      */
     StockRt getStockRtInfo(@Param("stockCode") String stockCode, @Param("curDate") Date curDate);
+
+    /**
+     * 个股交易流水行情数据查询
+     * @param stockCode 股票代码
+     * @return
+     */
+    List<Map<String, Object>> getStockStatement(@Param("stockCode") String stockCode);
 }

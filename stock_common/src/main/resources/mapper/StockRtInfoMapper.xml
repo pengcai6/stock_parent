@@ -216,6 +216,15 @@
         from stock_rt_info
         where cur_time=#{curDate} and stock_code =#{stockCode};
     </select>
+    <select id="getStockStatement" resultType="java.util.Map">
+        select DATE_FORMAT(cur_time, '%Y%m%d%H%i') as date,
+               trade_amount                        as tradeAmt,
+               trade_volume                        as tradeVol,
+               cur_price                           as tradePrice
+        from stock_rt_info
+        where stock_code = #{stockCode}
+        order by cur_time desc limit 10
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from stock_rt_info

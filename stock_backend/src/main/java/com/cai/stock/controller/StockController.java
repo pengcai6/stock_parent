@@ -216,4 +216,17 @@ public class StockController {
         return stockService.getStockRtInfoNow(stockCode);
     }
 
+    /**
+     * 个股交易流水行情数据查询--查询最新交易流水，按照交易时间降序取前10
+     * @param stockCode 股票编码
+     * @return
+     */
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", dataType = "string", name = "stockCode", value = "股票编码", required = true)
+    })
+    @ApiOperation(value = "个股交易流水行情数据查询--查询最新交易流水，按照交易时间降序取前10", notes = "个股交易流水行情数据查询--查询最新交易流水，按照交易时间降序取前10", httpMethod = "GET")
+    @GetMapping("/stock/screen/second")
+    public R<List<Map<String,Object>>> getStockStatement(@RequestParam(value = "code") String stockCode){
+    return stockService.getStockStatement(stockCode);
+    }
 }
