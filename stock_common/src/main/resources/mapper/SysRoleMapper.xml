@@ -26,6 +26,12 @@
         from sys_role
         where  id = #{id,jdbcType=BIGINT} 
     </select>
+    <select id="selectByUsername" resultType="map">
+        select id,
+               username,
+               phone, real_name as realName, nick_name as nickName,
+               email, status, sex from sys_user where username=#{username};
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from sys_role

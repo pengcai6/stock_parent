@@ -2,27 +2,31 @@ package com.cai.stock.service.impl;
 
 import cn.hutool.captcha.CaptchaUtil;
 import cn.hutool.captcha.GifCaptcha;
-import cn.hutool.captcha.LineCaptcha;
 import com.cai.stock.constant.StockConstant;
+import com.cai.stock.mapper.SysPermissionMapper;
+import com.cai.stock.mapper.SysRoleMapper;
 import com.cai.stock.mapper.SysUserMapper;
 import com.cai.stock.pojo.entity.SysUser;
 import com.cai.stock.service.UserService;
 import com.cai.stock.utils.IdWorker;
+import com.cai.stock.utils.permission;
 import com.cai.stock.vo.req.LoginReqVo;
-import com.cai.stock.vo.resp.LoginRespVo;
 import com.cai.stock.vo.resp.R;
 import com.cai.stock.vo.resp.ResponseCode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import static com.cai.stock.utils.permission.findAllChildren;
 
 /**
  * 定义服务实现
@@ -38,6 +42,12 @@ public class UserServiceImpl implements UserService {
     private IdWorker idWorker;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private   SysRoleMapper sysRoleMapper;
+    @Autowired
+    private SysPermissionMapper sysPermissionMapper;
+    @Autowired
+    private permission permission;
     /**
      * 根据用户名查询用户信息
      *
@@ -56,7 +66,7 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
-    public R<LoginRespVo> login(LoginReqVo vo) {
+    public R<Map<String, Object>> login(LoginReqVo vo) {
         //1.判断参数是否合法、
         if (vo == null || StringUtils.isBlank(vo.getUsername()) || StringUtils.isBlank(vo.getPassword())) {
             return R.error(ResponseCode.DATA_ERROR);
@@ -76,9 +86,10 @@ public class UserServiceImpl implements UserService {
             //验证码错误
             return R.error(ResponseCode.CHECK_CODE_ERROR);
         }
+        String username=vo.getUsername();
 
         //2.根据用户名去数据库查询用户信息,获取密码的密文
-        SysUser dbUser = sysUserMapper.findUserInfoByUsername(vo.getUsername());
+        SysUser dbUser = sysUserMapper.findUserInfoByUsername(username);
         if (dbUser == null) {
             //用户不存在
             return R.error(ResponseCode.ACCOUNT_NOT_EXISTS);
@@ -87,14 +98,36 @@ public class UserServiceImpl implements UserService {
         if (!passwordEncoder.matches(vo.getPassword(), dbUser.getPassword())) {
             return R.error(ResponseCode.USERNAME_OR_PASSWORD_ERROR);
         }
+        //封装数据
+        Map<String, Object> data = new HashMap<>();
+        //1.根据用户名已经查询了用户信息，且做了用户信息合法性的判断；
+        Map sysUser =sysRoleMapper.selectByUsername(username);
+        // 2.如果 用户合法，则根据用户的id去数据库查询用户拥有的权限信息集合；
+        List<Map<String, Object>> menus= sysPermissionMapper.getMenus(username);
+        List<String> permissions=new ArrayList<>();
+        data.putAll(sysUser);
+        List<Map<String, Object>> maps = findAllChildren(0l, menus);
+        for (Map<String, Object> map : menus) {
+            if((Integer) map.get("type")==3){
+                String permission=(String) map.get("code");
+                permissions.add(permission);
+            }
+        }
+        data.put("menus",maps);
+        data.put("permissions",permissions);
+        //3.获取按钮权限标识集合（获取权限集合中type=3的权限信息）
+
+
+
         //4.响应
-        LoginRespVo RespVo = new LoginRespVo();
+//        LoginRespVo RespVo = new LoginRespVo();
 //        RespVo.setUsername(dbUser.getUsername());
 //        RespVo.setNickName(dbUser.getNickName());
 //        RespVo.setPhone(dbUser.getPhone());
-        BeanUtils.copyProperties(dbUser, RespVo);
+//        BeanUtils.copyProperties(dbUser, RespVo);
         //必须保证属性名称与类型一致
-        return R.ok(RespVo);
+//        return R.ok(RespVo);
+        return R.ok(data);
     }
 
     /**

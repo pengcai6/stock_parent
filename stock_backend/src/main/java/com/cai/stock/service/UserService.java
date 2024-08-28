@@ -2,7 +2,6 @@ package com.cai.stock.service;
 
 import com.cai.stock.pojo.entity.SysUser;
 import com.cai.stock.vo.req.LoginReqVo;
-import com.cai.stock.vo.resp.LoginRespVo;
 import com.cai.stock.vo.resp.R;
 
 import java.util.Map;
@@ -25,10 +24,11 @@ public interface UserService {
      * @param vo
      * @return
      */
-    R<LoginRespVo> login(LoginReqVo vo);
+    R<Map<String, Object>> login(LoginReqVo vo);
     /**
      * 生成图片验证码功能
      * @return
      */
     R<Map> getCaptchaId();
+
 }

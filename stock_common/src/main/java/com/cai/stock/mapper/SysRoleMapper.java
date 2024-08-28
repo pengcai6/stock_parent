@@ -1,6 +1,9 @@
 package com.cai.stock.mapper;
 
 import com.cai.stock.pojo.entity.SysRole;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.Map;
 
 /**
 * @author cai
@@ -22,4 +25,10 @@ public interface SysRoleMapper {
 
     int updateByPrimaryKey(SysRole record);
 
+    /**
+     * 根据用户名查询用户信息
+     * @param username 用户名
+     * @return
+     */
+    Map selectByUsername(@Param("username") String username);
 }

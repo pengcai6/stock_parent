@@ -36,6 +36,26 @@
         from sys_permission
         where  id = #{id,jdbcType=BIGINT} 
     </select>
+    <select id="getMenus" resultType="java.util.Map">
+        select distinct sp.id as id,sp.title as title,sp.icon as icon,sp.url as path,sp.name as name,sp.pid  as pid,sp.type,sp.code
+        from sys_permission sp
+                 join stock_db.sys_role_permission srp on sp.id = srp.permission_id
+                 join sys_role sr on sr.id = srp.role_id
+        where sr.id = (select sr.id
+                       from sys_user su
+                                join stock_db.sys_user_role sur on su.id = sur.user_id
+                                join sys_role sr on sur.role_id = sr.id
+                       where su.username = #{username})
+    </select>
+    <select id="selectAllById" resultType="java.util.Map">
+        select distinct sp.id as id,sp.title as title,sp.icon as icon,sp.url as path,sp.name as name from sys_permission sp
+        where sp.id=#{id}
+    </select>
+
+    <select id="selectAllByPid" resultType="java.util.Map">
+        select distinct sp.id as id,sp.title as title,sp.icon as icon,sp.url as path,sp.name as name from sys_permission sp
+        where sp.pid=#{pid}
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from sys_permission

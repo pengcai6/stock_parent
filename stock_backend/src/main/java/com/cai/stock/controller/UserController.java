@@ -18,9 +18,9 @@ import java.util.Map;
 /**
  * 定义用户web层接口资源bean
  */
+@Api(value = "/api", tags = {"定义用户web层接口资源bean"})
 @RestController
 @RequestMapping("/api")
-@Api(tags = "用户相关接口处理")
 public class UserController {
     @Autowired
     private UserServiceImpl userService;
@@ -31,23 +31,26 @@ public class UserController {
      * @param name
      * @return
      */
-    @ApiOperation(value = "根据用户名查询信息")
-    @ApiImplicitParams(
-            @ApiImplicitParam(name = "name",value = "用户名",dataType = "string",required = true,type = "path")
-    )
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "path", dataType = "string", name = "name", value = "", required = true)
+    })
+    @ApiOperation(value = "根据用户名查询信息", notes = "根据用户名称查询用户信息", httpMethod = "GET")
     @GetMapping("/user/{userName}")
     public SysUser getUserByUserName(@PathVariable("userName") String name) {
         return userService.findUserInfoByUsername(name);
     }
 
     /**
-     * 用户登陆功能
+     * 用户登陆功能 完善用户登录成功动态回显菜单栏
      * @param Vo
      * @return
      */
-    @ApiOperation(value = "用户登陆功能")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "body", dataType = "LoginReqVo", name = "Vo", value = "", required = true)
+    })
+    @ApiOperation(value = "用户登陆功能", notes = "用户登陆功能", httpMethod = "POST")
     @PostMapping("/login")
-    public R<LoginRespVo> login(@RequestBody LoginReqVo Vo){
+    public R<Map<String, Object>> login(@RequestBody LoginReqVo Vo){
     return userService.login(Vo);
     }
 
@@ -55,7 +58,7 @@ public class UserController {
      * 生成图片验证码功能
      * @return
      */
-    @ApiOperation("验证码功能")
+    @ApiOperation(value = "验证码功能", notes = "生成图片验证码功能", httpMethod = "GET")
     @GetMapping("/captcha")
     public R<Map> getCaptchaId(){
     return userService.getCaptchaId();
