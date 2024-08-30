@@ -32,10 +32,25 @@
                phone, real_name as realName, nick_name as nickName,
                email, status, sex from sys_user where username=#{username};
     </select>
+    <select id="getRolesById" resultType="java.lang.Long">
+        select role_id as id
+        from stock_db.sys_user_role
+        where user_id =#{userId};
+    </select>
+    <select id="getAllRole" resultType="com.cai.stock.pojo.entity.SysRole">
+        select sr.id as id,  sr.name as name, sr.description as description, sr.status as status,
+               sr.create_time as create_time, sr.update_time as update_time, sr.deleted as deleted
+        from sys_role sr
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from sys_role
         where  id = #{id,jdbcType=BIGINT} 
+    </delete>
+    <delete id="deleteByUserId">
+        DELETE from
+            sys_user_role
+        WHERE user_id = #{userId}
     </delete>
     <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.cai.stock.pojo.entity.SysRole" useGeneratedKeys="true">
         insert into sys_role
@@ -66,6 +81,10 @@
                 <if test="updateTime != null">#{updateTime,jdbcType=TIMESTAMP},</if>
                 <if test="deleted != null">#{deleted,jdbcType=TINYINT},</if>
         </trim>
+    </insert>
+    <insert id="insertList">
+        insert into sys_user_role (id, user_id, role_id, create_time)
+        values (#{id}, #{userId}, #{roleId}, now())
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.cai.stock.pojo.entity.SysRole">
         update sys_role

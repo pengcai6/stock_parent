@@ -48,9 +48,55 @@
         from sys_user
     </select>
 
+    <select id="getUserByConditions" resultType="com.cai.stock.pojo.entity.SysUser">
+        SELECT id, username,create_id as createId,
+               `password`,
+               phone,
+               real_name    as realName,
+               nick_name    as nickName,
+               email,
+               `status`,
+               sex,
+               deleted,
+               create_id    as createId,
+               update_id    as updateId,
+               create_where as createWhere,
+               create_time  as createTime,
+               update_time  as updateTime
+        FROM sys_user
+        WHERE  1=1
+            <if test="reVo.username != null and !reVo.username.isEmpty() ">
+            and    username = #{reVo.username}
+            </if>
+            <if test="reVo.nickName!=null and !reVo.nickName.isEmpty()  ">
+               and nick_name=#{reVo.nickName}
+            </if>
+             <if test="reVo.startTime!=null and reVo.endTime !=null">
+            and
+            create_time  BETWEEN  #{reVo.startTime} and #{reVo.endTime}
+             </if>
+    </select>
+    <select id="getUserInfoByUserId" resultType="java.util.Map">
+        select id,
+               username,
+               phone,
+               real_name as realName,
+               nick_name as nickName,
+               sex,
+               status,
+               email
+        from sys_user where id=#{userId};
+    </select>
+
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from sys_user
         where  id = #{id,jdbcType=BIGINT} 
+    </delete>
+    <delete id="deleteUsers">
+        delete from sys_user
+        where  id in <foreach collection="userIds" separator="," item="id" open="(" close=")">
+        #{id}
+    </foreach>
     </delete>
     <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.cai.stock.pojo.entity.SysUser" useGeneratedKeys="true">
         insert into sys_user
@@ -156,19 +202,14 @@
         update sys_user
         set 
             username =  #{username,jdbcType=VARCHAR},
-            password =  #{password,jdbcType=VARCHAR},
             phone =  #{phone,jdbcType=VARCHAR},
             real_name =  #{realName,jdbcType=VARCHAR},
             nick_name =  #{nickName,jdbcType=VARCHAR},
             email =  #{email,jdbcType=VARCHAR},
             status =  #{status,jdbcType=TINYINT},
             sex =  #{sex,jdbcType=TINYINT},
-            deleted =  #{deleted,jdbcType=TINYINT},
-            create_id =  #{createId,jdbcType=BIGINT},
-            update_id =  #{updateId,jdbcType=BIGINT},
             create_where =  #{createWhere,jdbcType=TINYINT},
-            create_time =  #{createTime,jdbcType=TIMESTAMP},
-            update_time =  #{updateTime,jdbcType=TIMESTAMP}
+            update_time =  now()
         where   id = #{id,jdbcType=BIGINT} 
     </update>
 </mapper>

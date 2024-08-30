@@ -3,6 +3,7 @@ package com.cai.stock.mapper;
 import com.cai.stock.pojo.entity.SysRole;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,4 +32,32 @@ public interface SysRoleMapper {
      * @return
      */
     Map selectByUsername(@Param("username") String username);
+
+    /**
+     * 通过userId查询角色信息
+     * @param userId 用户id
+     * @return
+     */
+    List<SysRole> getRolesById(@Param("userId") String userId);
+
+    /**
+     * 获取全部角色信息
+     * @return
+     */
+    List<Long> getAllRole();
+
+    /**
+     * 通过角色id删除
+     * @param userId
+     */
+    void deleteByUserId(@Param("userId") String userId);
+
+    /**
+     * 批量添加角色信息
+     *
+     * @param id
+     * @param roleId 角色id
+     * @param userId 用户id
+     */
+    void insertList(@Param("id") long id, @Param("roleId") String roleId, @Param("userId") String userId);
 }

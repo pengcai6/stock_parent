@@ -6,15 +6,22 @@ import com.cai.stock.constant.StockConstant;
 import com.cai.stock.mapper.SysPermissionMapper;
 import com.cai.stock.mapper.SysRoleMapper;
 import com.cai.stock.mapper.SysUserMapper;
+import com.cai.stock.pojo.entity.SysRole;
 import com.cai.stock.pojo.entity.SysUser;
+import com.cai.stock.pojo.vo.UserReVo;
 import com.cai.stock.service.UserService;
 import com.cai.stock.utils.IdWorker;
 import com.cai.stock.utils.permission;
 import com.cai.stock.vo.req.LoginReqVo;
+import com.cai.stock.vo.req.UpdateRoleReqVo;
+import com.cai.stock.vo.resp.PageResult;
 import com.cai.stock.vo.resp.R;
 import com.cai.stock.vo.resp.ResponseCode;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -43,11 +50,12 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
-    private   SysRoleMapper sysRoleMapper;
+    private SysRoleMapper sysRoleMapper;
     @Autowired
     private SysPermissionMapper sysPermissionMapper;
     @Autowired
     private permission permission;
+
     /**
      * 根据用户名查询用户信息
      *
@@ -72,8 +80,7 @@ public class UserServiceImpl implements UserService {
             return R.error(ResponseCode.DATA_ERROR);
         }
         //判断输入的验证码是否存在
-        if(StringUtils.isBlank(vo.getCode())||StringUtils.isBlank(vo.getSessionId()))
-        {
+        if (StringUtils.isBlank(vo.getCode()) || StringUtils.isBlank(vo.getSessionId())) {
             return R.error(ResponseCode.CHECK_CODE_ERROR);
         }
         //判断redis中保存的验证码是否与输入的验证码相同（比较时忽略大小写）
@@ -86,7 +93,7 @@ public class UserServiceImpl implements UserService {
             //验证码错误
             return R.error(ResponseCode.CHECK_CODE_ERROR);
         }
-        String username=vo.getUsername();
+        String username = vo.getUsername();
 
         //2.根据用户名去数据库查询用户信息,获取密码的密文
         SysUser dbUser = sysUserMapper.findUserInfoByUsername(username);
@@ -101,22 +108,21 @@ public class UserServiceImpl implements UserService {
         //封装数据
         Map<String, Object> data = new HashMap<>();
         //1.根据用户名已经查询了用户信息，且做了用户信息合法性的判断；
-        Map sysUser =sysRoleMapper.selectByUsername(username);
+        Map sysUser = sysRoleMapper.selectByUsername(username);
         // 2.如果 用户合法，则根据用户的id去数据库查询用户拥有的权限信息集合；
-        List<Map<String, Object>> menus= sysPermissionMapper.getMenus(username);
-        List<String> permissions=new ArrayList<>();
+        List<Map<String, Object>> menus = sysPermissionMapper.getMenus(username);
+        List<String> permissions = new ArrayList<>();
         data.putAll(sysUser);
         List<Map<String, Object>> maps = findAllChildren(0l, menus);
         for (Map<String, Object> map : menus) {
-            if((Integer) map.get("type")==3){
-                String permission=(String) map.get("code");
+            if ((Integer) map.get("type") == 3) {
+                String permission = (String) map.get("code");
                 permissions.add(permission);
             }
         }
-        data.put("menus",maps);
-        data.put("permissions",permissions);
+        data.put("menus", maps);
+        data.put("permissions", permissions);
         //3.获取按钮权限标识集合（获取权限集合中type=3的权限信息）
-
 
 
         //4.响应
@@ -144,7 +150,7 @@ public class UserServiceImpl implements UserService {
         参数3：图片中验证码的长度
         参数4：干扰线的数量
          */
-        GifCaptcha Captcha = CaptchaUtil.createGifCaptcha(250, 40,4);
+        GifCaptcha Captcha = CaptchaUtil.createGifCaptcha(250, 40, 4);
         //获取校验码
         String checkCode = Captcha.getCode();
 
@@ -152,17 +158,135 @@ public class UserServiceImpl implements UserService {
         String imageData = Captcha.getImageBase64();
         //2.获取唯一sessionId 转化为String，避免前端精度丢失
         String sessionId = String.valueOf(idWorker.nextId());
-        log.info("当前生成的验证码为:{}，会话id为:{}",checkCode,sessionId);
+        log.info("当前生成的验证码为:{}，会话id为:{}", checkCode, sessionId);
         //3.SessionId作为key，校验码作为value存到redis中
         /*
         使用redis模拟Session行为，通过过期时间设置
          */
-        redisTemplate.opsForValue().set(StockConstant.CHECK_PREFIX+sessionId,checkCode,5, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(StockConstant.CHECK_PREFIX + sessionId, checkCode, 5, TimeUnit.MINUTES);
         //4.组合数据
-        Map<String,String> data=new HashMap();
-        data.put("imageData",imageData);
-        data.put("sessionId",sessionId);
+        Map<String, String> data = new HashMap();
+        data.put("imageData", imageData);
+        data.put("sessionId", sessionId);
         //5.响应数据
         return R.ok(data);
     }
+
+    /**
+     * 多条件综合查询用户分页信息，条件包含：分页信息 用户创建日期范围
+     *
+     * @param reVo 查询参数
+     * @return
+     */
+    @Override
+    public R<PageResult<SysUser>> getUserByConditions(UserReVo reVo) {
+        Integer pageNum = reVo.getPageNum();
+        Integer pageSize = reVo.getPageSize();
+        PageHelper.startPage(pageNum, pageSize);
+        //调用mapper接口查询数据
+        List<SysUser> data = sysUserMapper.getUserByConditions(reVo);
+        //封装后返回
+        PageInfo<SysUser> pageInfo = new PageInfo<>(data);
+        PageResult<SysUser> result = new PageResult<>(pageInfo);
+        result.setSize(20);
+        return R.ok(result);
+    }
+
+    /**
+     * 添加用户
+     *
+     * @param user 用户信息
+     * @return
+     */
+    @Override
+    public R insetUser(SysUser user) {
+        user.setCreateTime(DateTime.now().toDate());
+        user.setId(idWorker.nextId());
+        //调用插入接口
+        int count = sysUserMapper.insert(user);
+        if (count > 0) {
+            return R.ok("操作成功");
+        } else return R.error(ResponseCode.ERROR);
+    }
+
+    /**
+     * 获取用户具有的角色信息，以及所有角色信息
+     *
+     * @param userId 用户id
+     * @return
+     */
+    @Override
+    public R<Map<String, Object>> getRolesById(String userId) {
+        //创建Map
+        Map<String, Object> data = new HashMap<>();
+        //调用Mapper通过角色所有角色列表
+        List<Long> allRole = sysRoleMapper.getAllRole();
+        data.put("allRole", allRole);
+        //调用Mapper通过id查询用户拥有的角色
+        List<SysRole> ownRoleIds = sysRoleMapper.getRolesById(userId);
+        data.put("ownRoleIds", ownRoleIds);
+        return R.ok(data);
+    }
+
+    @Override
+    public R updateRole(UpdateRoleReqVo updateRoleReqVo) {
+        String userId = updateRoleReqVo.getUserId();
+        List<String> roleIds = updateRoleReqVo.getRoleIds();
+        //1.使用Mapper接口调用删除方法
+        sysRoleMapper.deleteByUserId(userId);
+        roleIds.forEach(roleId -> {
+            //生成列表id
+            long id = idWorker.nextId();
+            //2.使用mapper接口调用插入方法
+            sysRoleMapper.insertList(id, roleId, userId);
+        });
+        return R.ok(ResponseCode.SUCCESS.getMessage());
+    }
+
+    /**
+     * 批量删除用户信息，delete请求可通过请求体携带数据
+     *
+     * @param userIds 用户ids
+     * @return
+     */
+    @Override
+    public R deleteUser(List<Long> userIds) {
+        //调用mapper接口批量删除数据
+        int count = sysUserMapper.deleteUsers(userIds);
+        if (count > 0) {
+            return R.ok(ResponseCode.SUCCESS.getMessage());
+        } else return R.error(ResponseCode.ERROR.getMessage());
+    }
+
+    /**
+     * 根据用户id查询用户信息
+     *
+     * @param userId 用户id
+     * @return
+     */
+    @Override
+    public R<Map<String, Object>> getUserInfoByUserId(String userId) {
+//       调用mapper接口查询用户信息
+        Map<String, Object> data = sysUserMapper.getUserInfoByUserId(userId);
+        //返回数据
+        if (data != null) {
+            return R.ok(data);
+        } else return R.error(ResponseCode.NO_RESPONSE_DATA.getMessage());
+    }
+    /**
+     * 根据id更新用户基本信息
+     *
+     * @param sysUser 用户信息
+     * @return
+     */
+    @Override
+    public R updateUserInfo(SysUser sysUser) {
+        //调用mapper接口更新用户信息
+        int count =sysUserMapper.updateByPrimaryKey(sysUser);
+        if(count>0){
+            return R.ok(ResponseCode.SUCCESS.getMessage());
+        }
+        else return R.error(ResponseCode.ERROR.getMessage());
+    }
 }
+
