@@ -148,7 +148,7 @@
                            GROUP BY DATE_FORMAT(cur_time, '%Y%m%d'))
         group by date
     </select>
-    <select id="getStockMaxTime" resultType="java.lang.String">
+    <select id="getStockMaxTime" resultType="java.util.Date">
         select max(cur_time) as mxTime
         from stock_rt_info
         where cur_time between #{startDate} and #{endDate}
@@ -174,7 +174,7 @@
             #{StockMaxTime}
         </foreach> group by date
     </select>
-    <select id="getStockMaxWeekTime" resultType="java.lang.String">
+    <select id="getStockMaxWeekTime" resultType="java.util.Date">
         select max(cur_time) as mxTime
         from stock_rt_info
         where cur_time between #{startDate} and #{endDate}

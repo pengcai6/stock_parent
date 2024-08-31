@@ -80,11 +80,11 @@ public interface StockRtInfoMapper {
      * 查询指定股票在指定日期范围内的每天的最大时间；
      *
      * @param startDate 开始时间
-     * @param endDate 截止时间
+     * @param endDate   截止时间
      * @param stockCode 股票编号
      * @return
      */
-    List<String> getStockMaxTime(@Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("stockCode") String stockCode);
+    List<Date> getStockMaxTime(@Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("stockCode") String stockCode);
 
     /**
      * 查询指定日期范围内指定股票每天的交易数据通过已有时间数据
@@ -92,7 +92,7 @@ public interface StockRtInfoMapper {
      * @param stockCode 股票编号
      * @return
      */
-    List<Stock4EvrDayDomain> getStock4DkLineByMaxTime(@Param("StockMaxTimes") List<String> StockMaxTimes, @Param("stockCode") String stockCode);
+    List<Stock4EvrDayDomain> getStock4DkLineByMaxTime(@Param("StockMaxTimes") List<Date> StockMaxTimes, @Param("stockCode") String stockCode);
 
     /**
      * 批量插入个股数据
@@ -103,12 +103,13 @@ public interface StockRtInfoMapper {
 
     /**
      * 查询指定股票在指定日期范围内的每周的最大时间；
+     *
      * @param startDate
      * @param endDate
      * @param stockCode
      * @return
      */
-    List<String> getStockMaxWeekTime(@Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("stockCode") String stockCode);
+    List<Date> getStockMaxWeekTime(@Param("startDate") Date startDate, @Param("endDate") Date endDate, @Param("stockCode") String stockCode);
 
     /**
      * 个个股周K 数据查询 ，可以根据时间区间查询数周的K线数据

@@ -121,12 +121,12 @@ public class StockServiceImpl implements StockService {
         Date startDate = endDateTime.minusMonths(3).toDate();
         startDate = DateTime.parse("2021-6-30 09:32:00", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).toDate();
 
-        //2.调用Mapper接口获取指定日期范围内的日K线数据
-        // List<Stock4EvrDayDomain> infos  =stockRtInfoMapper.getStock4DkLine(startDate,endDate,stockCode);
+   //     2.调用Mapper接口获取指定日期范围内的日K线数据
+      //   List<Stock4EvrDayDomain> infos  =stockRtInfoMapper.getStock4DkLine(startDate,endDate,stockCode);
         //拆分步骤
-        //第一步：查询指定股票在指定日期范围内的每天的最大时间；
-        List<String> stockMaxTime = stockRtInfoMapper.getStockMaxTime(startDate, endDate, stockCode);
-        //第二步：将第一步的结果作为条件查询对应的数据；
+//        //第一步：查询指定股票在指定日期范围内的每天的最大时间；
+        List<Date> stockMaxTime = stockRtInfoMapper.getStockMaxTime(startDate, endDate, stockCode);
+//        //第二步：将第一步的结果作为条件查询对应的数据；
         List<Stock4EvrDayDomain> infos = stockRtInfoMapper.getStock4DkLineByMaxTime(stockMaxTime, stockCode);
         //3.返回数据
         return R.ok(infos);
@@ -152,13 +152,14 @@ public class StockServiceImpl implements StockService {
         //2.调用Mapper接口获取指定日期范围内的周K线数据
         //拆分步骤
         //第一步：查询指定股票在指定日期范围内的每天的最大时间；
-        List<String> stockMaxTime = stockRtInfoMapper.getStockMaxWeekTime(startDate, endDate, stockCode);
+        List<Date> stockMaxTime = stockRtInfoMapper.getStockMaxWeekTime(startDate, endDate, stockCode);
         List<Stock4EvrWeekDomain> data = new ArrayList<>();
         try {
-            for (String WeekMaxTime : stockMaxTime) {
-                //转为日期格式的星期最后一天
-                DateTime WeekEndDateTime = DateTime.parse(WeekMaxTime, DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"));
-                Date WeekEndDate = WeekEndDateTime.toDate();
+            for (Date WeekEndDate : stockMaxTime) {
+//                //转为日期格式的星期最后一天
+//                DateTime WeekEndDateTime = DateTime.parse(WeekMaxTime, DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss.SSS"));
+                DateTime WeekEndDateTime =new DateTime(WeekEndDate);
+//                Date WeekEndDate = WeekEndDateTime.toDate();
                 //获取周一的开盘时间
                 DateTime WeekStartDateTime = WeekEndDateTime.withDayOfWeek(1).withHourOfDay(9).withMinuteOfHour(30).withSecondOfMinute(0).withMillisOfSecond(0);
                 Date WeekStartDate = WeekStartDateTime.toDate();
