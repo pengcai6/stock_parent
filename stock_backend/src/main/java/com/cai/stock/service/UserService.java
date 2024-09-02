@@ -6,6 +6,7 @@ import com.cai.stock.pojo.vo.UserReVo;
 import com.cai.stock.vo.req.UpdateRoleReqVo;
 import com.cai.stock.vo.resp.PageResult;
 import com.cai.stock.vo.resp.R;
+import com.cai.stock.vo.resp.accessTokenLoginRespVo;
 
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,7 @@ public interface UserService {
      * @param vo
      * @return
      */
-    R<Map<String, Object>> login(LoginReqVo vo);
+    R<accessTokenLoginRespVo> login(LoginReqVo vo);
     /**
      * 生成图片验证码功能
      * @return

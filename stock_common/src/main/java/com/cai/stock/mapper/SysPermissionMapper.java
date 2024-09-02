@@ -1,6 +1,7 @@
 package com.cai.stock.mapper;
 
 import com.cai.stock.pojo.entity.SysPermission;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.Map;
 * @createDate 2024-08-16 15:51:52
 * @Entity com.cai.stock.pojo.entity.SysPermission
 */
+@Mapper
 public interface SysPermissionMapper {
 
     int deleteByPrimaryKey(Long id);
@@ -47,4 +49,6 @@ public interface SysPermissionMapper {
      * @return
      */
     List<Map> selectAllByPid(@Param("pid") Integer pid);
+
+    List<SysPermission> getPermsByUserId(@Param("uid") Long uid);
 }

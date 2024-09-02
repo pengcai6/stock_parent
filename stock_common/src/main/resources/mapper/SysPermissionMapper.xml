@@ -56,6 +56,15 @@
         select distinct sp.id as id,sp.title as title,sp.icon as icon,sp.url as path,sp.name as name from sys_permission sp
         where sp.pid=#{pid}
     </select>
+    <select id="getPermsByUserId" resultType="com.cai.stock.pojo.entity.SysPermission">
+        select distinct <include refid="Base_Column_List" />
+        from sys_permission
+        where id in (select permission_id
+        from sys_role_permission
+        where role_id in (select sys_user_role.role_id
+        from sys_user_role
+        where user_id=#{uid}))
+    </select>
 
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         delete from sys_permission

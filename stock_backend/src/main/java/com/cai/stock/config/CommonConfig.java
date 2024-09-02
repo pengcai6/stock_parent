@@ -23,10 +23,10 @@ public class CommonConfig {
  * 定义密码加密，匹配器bean
      * @return
      */
-    @Bean
-    public PasswordEncoder passwordEncoder(){
-    return new BCryptPasswordEncoder();
-    }
+//    @Bean
+//    public PasswordEncoder passwordEncoder(){
+//    return new BCryptPasswordEncoder();
+//    }
 
     /**
      *基于雪花算法保证生成的id唯一

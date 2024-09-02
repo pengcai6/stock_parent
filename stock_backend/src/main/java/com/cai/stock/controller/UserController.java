@@ -8,11 +8,13 @@ import com.cai.stock.pojo.vo.UserReVo;
 import com.cai.stock.vo.req.UpdateRoleReqVo;
 import com.cai.stock.vo.resp.PageResult;
 import com.cai.stock.vo.resp.R;
+import com.cai.stock.vo.resp.accessTokenLoginRespVo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,14 +50,14 @@ public class UserController {
      * @param Vo
      * @return
      */
-    @ApiImplicitParams({
-            @ApiImplicitParam(paramType = "body", dataType = "LoginReqVo", name = "Vo", value = "", required = true)
-    })
-    @ApiOperation(value = "用户登陆功能", notes = "用户登陆功能", httpMethod = "POST")
-    @PostMapping("/login")
-    public R<Map<String, Object>> login(@RequestBody LoginReqVo Vo){
-    return userService.login(Vo);
-    }
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(paramType = "body", dataType = "LoginReqVo", name = "Vo", value = "", required = true)
+//    })
+//    @ApiOperation(value = "用户登陆功能", notes = "用户登陆功能", httpMethod = "POST")
+//    @PostMapping("/login")
+//    public R<accessTokenLoginRespVo> login(@RequestBody LoginReqVo Vo){
+//    return userService.login(Vo);
+//    }
 
     /**
      * 生成图片验证码功能
@@ -133,6 +135,7 @@ public class UserController {
    })
    @ApiOperation(value = "批量删除用户信息，delete请求可通过请求体携带数据", notes = "批量删除用户信息，delete请求可通过请求体携带数据", httpMethod = "DELETE")
    @DeleteMapping("/user")
+   @PreAuthorize("hasAuthority('sys:user:delete')")
     public R deleteUser(@RequestBody List<Long> userIds){
         return userService.deleteUser(userIds);
    }

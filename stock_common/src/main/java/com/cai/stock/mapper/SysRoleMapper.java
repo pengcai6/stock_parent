@@ -38,13 +38,14 @@ public interface SysRoleMapper {
      * @param userId 用户id
      * @return
      */
-    List<SysRole> getRolesById(@Param("userId") String userId);
+    List<SysRole> getRolesById(@Param("userId") Long userId);
 
     /**
      * 获取全部角色信息
+     *
      * @return
      */
-    List<Long> getAllRole();
+    List<SysRole> getAllRole();
 
     /**
      * 通过角色id删除
@@ -60,4 +61,11 @@ public interface SysRoleMapper {
      * @param userId 用户id
      */
     void insertList(@Param("id") long id, @Param("roleId") String roleId, @Param("userId") String userId);
+
+    /**
+     * 通过用户id查找拥有的角色id
+     * @param userId
+     * @return
+     */
+    List<Long> getRolesIdsById(@Param("userId") String userId);
 }

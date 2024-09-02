@@ -6,10 +6,13 @@ import com.cai.stock.constant.StockConstant;
 import com.cai.stock.mapper.SysPermissionMapper;
 import com.cai.stock.mapper.SysRoleMapper;
 import com.cai.stock.mapper.SysUserMapper;
+import com.cai.stock.pojo.domain.LoginUserDomain;
+import com.cai.stock.pojo.entity.SysPermission;
 import com.cai.stock.pojo.entity.SysRole;
 import com.cai.stock.pojo.entity.SysUser;
 import com.cai.stock.pojo.vo.UserReVo;
 import com.cai.stock.service.UserService;
+import com.cai.stock.service.permissionService;
 import com.cai.stock.utils.IdWorker;
 import com.cai.stock.utils.permission;
 import com.cai.stock.vo.req.LoginReqVo;
@@ -17,11 +20,15 @@ import com.cai.stock.vo.req.UpdateRoleReqVo;
 import com.cai.stock.vo.resp.PageResult;
 import com.cai.stock.vo.resp.R;
 import com.cai.stock.vo.resp.ResponseCode;
+import com.cai.stock.vo.resp.accessTokenLoginRespVo;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.google.common.base.Strings;
+import com.google.common.io.BaseEncoding;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,6 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static com.cai.stock.utils.permission.findAllChildren;
 
@@ -55,7 +63,8 @@ public class UserServiceImpl implements UserService {
     private SysPermissionMapper sysPermissionMapper;
     @Autowired
     private permission permission;
-
+    @Autowired
+    private permissionService permissionService;
     /**
      * 根据用户名查询用户信息
      *
@@ -74,7 +83,7 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
-    public R<Map<String, Object>> login(LoginReqVo vo) {
+    public R<accessTokenLoginRespVo> login(LoginReqVo vo) {
         //1.判断参数是否合法、
         if (vo == null || StringUtils.isBlank(vo.getUsername()) || StringUtils.isBlank(vo.getPassword())) {
             return R.error(ResponseCode.DATA_ERROR);
@@ -105,35 +114,20 @@ public class UserServiceImpl implements UserService {
         if (!passwordEncoder.matches(vo.getPassword(), dbUser.getPassword())) {
             return R.error(ResponseCode.USERNAME_OR_PASSWORD_ERROR);
         }
-        //封装数据
-        Map<String, Object> data = new HashMap<>();
-        //1.根据用户名已经查询了用户信息，且做了用户信息合法性的判断；
-        Map sysUser = sysRoleMapper.selectByUsername(username);
-        // 2.如果 用户合法，则根据用户的id去数据库查询用户拥有的权限信息集合；
-        List<Map<String, Object>> menus = sysPermissionMapper.getMenus(username);
-        List<String> permissions = new ArrayList<>();
-        data.putAll(sysUser);
-        List<Map<String, Object>> maps = findAllChildren(0l, menus);
-        for (Map<String, Object> map : menus) {
-            if ((Integer) map.get("type") == 3) {
-                String permission = (String) map.get("code");
-                permissions.add(permission);
-            }
-        }
-        data.put("menus", maps);
-        data.put("permissions", permissions);
-        //3.获取按钮权限标识集合（获取权限集合中type=3的权限信息）
-
-
-        //4.响应
-//        LoginRespVo RespVo = new LoginRespVo();
-//        RespVo.setUsername(dbUser.getUsername());
-//        RespVo.setNickName(dbUser.getNickName());
-//        RespVo.setPhone(dbUser.getPhone());
-//        BeanUtils.copyProperties(dbUser, RespVo);
-        //必须保证属性名称与类型一致
-//        return R.ok(RespVo);
-        return R.ok(data);
+        LoginUserDomain loginUserDomain = new LoginUserDomain();
+        BeanUtils.copyProperties(dbUser,loginUserDomain);
+        List<SysPermission> perms = sysPermissionMapper.getPermsByUserId(dbUser.getId());
+        //前端需要的获取菜单按钮集合
+        List<String> permissions = perms.stream()
+                .filter(per -> !Strings.isNullOrEmpty(per.getCode()) && per.getType() == 3)
+                .map(per -> per.getCode()).collect(Collectors.toList());
+        loginUserDomain.setPermissions(permissions);
+        loginUserDomain.setMenus(permissionService.getTree(perms, 0L));
+        accessTokenLoginRespVo accessTokenLoginRespVo = new accessTokenLoginRespVo();
+        BeanUtils.copyProperties(loginUserDomain,accessTokenLoginRespVo);
+        String info=accessTokenLoginRespVo.getId()+":"+ accessTokenLoginRespVo.getUsername();
+        accessTokenLoginRespVo.setAccessToken(BaseEncoding.base64().encode(info.getBytes()));
+        return R.ok(accessTokenLoginRespVo);
     }
 
     /**
@@ -220,10 +214,10 @@ public class UserServiceImpl implements UserService {
         //创建Map
         Map<String, Object> data = new HashMap<>();
         //调用Mapper通过角色所有角色列表
-        List<Long> allRole = sysRoleMapper.getAllRole();
+        List<SysRole> allRole = sysRoleMapper.getAllRole();
         data.put("allRole", allRole);
         //调用Mapper通过id查询用户拥有的角色
-        List<SysRole> ownRoleIds = sysRoleMapper.getRolesById(userId);
+        List<Long> ownRoleIds = sysRoleMapper.getRolesIdsById(userId);
         data.put("ownRoleIds", ownRoleIds);
         return R.ok(data);
     }
