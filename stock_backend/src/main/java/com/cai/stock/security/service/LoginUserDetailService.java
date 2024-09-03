@@ -8,7 +8,7 @@ import com.cai.stock.pojo.entity.SysPermission;
 import com.cai.stock.pojo.entity.SysRole;
 import com.cai.stock.pojo.entity.SysUser;
 import com.cai.stock.security.user.LoginUserDetail;
-import com.cai.stock.service.permissionService;
+import com.cai.stock.service.PermissionService;
 import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -34,7 +34,7 @@ public class LoginUserDetailService implements UserDetailsService {
     @Autowired
     private SysPermissionMapper sysPermissionMapper;
     @Autowired
-    private permissionService permissionService;
+    private PermissionService permissionService;
     @Autowired
     private SysRoleMapper sysRoleMapper;
     /**

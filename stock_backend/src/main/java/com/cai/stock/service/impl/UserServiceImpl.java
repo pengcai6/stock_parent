@@ -13,7 +13,7 @@ import com.cai.stock.pojo.entity.SysRole;
 import com.cai.stock.pojo.entity.SysUser;
 import com.cai.stock.pojo.vo.UserReVo;
 import com.cai.stock.service.UserService;
-import com.cai.stock.service.permissionService;
+import com.cai.stock.service.PermissionService;
 import com.cai.stock.utils.IdWorker;
 import com.cai.stock.utils.permission;
 import com.cai.stock.vo.req.LoginReqVo;
@@ -35,14 +35,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import static com.cai.stock.utils.permission.findAllChildren;
 
 /**
  * 定义服务实现
@@ -65,7 +62,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private permission permission;
     @Autowired
-    private permissionService permissionService;
+    private PermissionService permissionService;
     @Autowired
     private SysRolePermissionMapper sysRolePermissionMapper;
     /**

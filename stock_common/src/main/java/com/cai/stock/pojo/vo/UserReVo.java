@@ -33,11 +33,11 @@ public class UserReVo {
     @ApiModelProperty("昵称")
     String nickName;
     //开始时间
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "Asia/Shanghai")
     @ApiModelProperty("开始时间")
     Date startTime;
     //结束时间
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "Asia/Shanghai")
     @ApiModelProperty("结束时间")
     Date endTime;
 }

@@ -57,5 +57,9 @@ public interface SysPermissionMapper {
      * @return
      */
     List<SysPermission> getAllPerms();
-
+    /**
+     * 添加权限时回显权限树,仅仅显示目录和菜单
+     * @return
+     */
+    List<Map> getPermissionsTree();
 }
