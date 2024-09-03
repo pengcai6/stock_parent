@@ -1,5 +1,6 @@
 package com.cai.stock.pojo.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.models.auth.In;
@@ -32,9 +33,11 @@ public class UserReVo {
     @ApiModelProperty("昵称")
     String nickName;
     //开始时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty("开始时间")
     Date startTime;
     //结束时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @ApiModelProperty("结束时间")
     Date endTime;
 }
