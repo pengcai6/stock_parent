@@ -57,8 +57,8 @@
     </delete>
     <delete id="deleteByUserId">
         DELETE from
-            sys_user_role
-        WHERE user_id = #{userId}
+            sys_role
+        WHERE id = #{userId}
     </delete>
     <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.cai.stock.pojo.entity.SysRole" useGeneratedKeys="true">
         insert into sys_role
@@ -94,6 +94,10 @@
         insert into sys_user_role (id, user_id, role_id)
         values (#{id}, #{userId}, #{roleId})
     </insert>
+    <insert id="addRole">
+        INSERT INTO sys_role  (id, name, description, create_time,update_time)
+        VALUES (#{sysRole.id},#{sysRole.name},#{sysRole.description},#{sysRole.createTime},#{sysRole.updateTime})
+    </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.cai.stock.pojo.entity.SysRole">
         update sys_role
         <set>
@@ -128,5 +132,10 @@
             update_time =  #{updateTime,jdbcType=TIMESTAMP},
             deleted =  #{deleted,jdbcType=TINYINT}
         where   id = #{id,jdbcType=BIGINT} 
+    </update>
+    <update id="updateRoleStatue">
+        update sys_role
+        set      status = #{status}
+        where   id = #{roleId}
     </update>
 </mapper>

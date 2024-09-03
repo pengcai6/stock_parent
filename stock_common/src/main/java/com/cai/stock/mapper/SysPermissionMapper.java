@@ -51,4 +51,11 @@ public interface SysPermissionMapper {
     List<Map> selectAllByPid(@Param("pid") Integer pid);
 
     List<SysPermission> getPermsByUserId(@Param("uid") Long uid);
+
+    /**
+     * 获取所有权限
+     * @return
+     */
+    List<SysPermission> getAllPerms();
+
 }

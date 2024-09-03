@@ -5,6 +5,7 @@ import cn.hutool.captcha.GifCaptcha;
 import com.cai.stock.constant.StockConstant;
 import com.cai.stock.mapper.SysPermissionMapper;
 import com.cai.stock.mapper.SysRoleMapper;
+import com.cai.stock.mapper.SysRolePermissionMapper;
 import com.cai.stock.mapper.SysUserMapper;
 import com.cai.stock.pojo.domain.LoginUserDomain;
 import com.cai.stock.pojo.entity.SysPermission;
@@ -65,6 +66,8 @@ public class UserServiceImpl implements UserService {
     private permission permission;
     @Autowired
     private permissionService permissionService;
+    @Autowired
+    private SysRolePermissionMapper sysRolePermissionMapper;
     /**
      * 根据用户名查询用户信息
      *
@@ -227,7 +230,8 @@ public class UserServiceImpl implements UserService {
         String userId = updateRoleReqVo.getUserId();
         List<String> roleIds = updateRoleReqVo.getRoleIds();
         //1.使用Mapper接口调用删除方法
-        sysRoleMapper.deleteByUserId(userId);
+        sysRolePermissionMapper.deleteByUserId(userId);
+      //  sysRoleMapper.deleteByUserId(userId);
         roleIds.forEach(roleId -> {
             //生成列表id
             long id = idWorker.nextId();

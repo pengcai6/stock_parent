@@ -12,7 +12,8 @@ import java.util.List;
 
 @SpringBootTest
 public class Test {
-    @Autowired StockRtInfoMapper stockRtInfoMapper;
+    @Autowired
+    StockRtInfoMapper stockRtInfoMapper;
 
     /**
      * 查询指定股票在指定日期范围内的每天的最大时间；

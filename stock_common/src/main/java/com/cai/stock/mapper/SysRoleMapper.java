@@ -3,6 +3,8 @@ package com.cai.stock.mapper;
 import com.cai.stock.pojo.entity.SysRole;
 import org.apache.ibatis.annotations.Param;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +15,11 @@ import java.util.Map;
 * @Entity com.cai.stock.pojo.entity.SysRole
 */
 public interface SysRoleMapper {
-
+    /**
+     * 通过角色id删除对象的角色
+     * @param id
+     * @return
+     */
     int deleteByPrimaryKey(Long id);
 
     int insert(SysRole record);
@@ -68,4 +74,21 @@ public interface SysRoleMapper {
      * @return
      */
     List<Long> getRolesIdsById(@Param("userId") String userId);
+
+    Integer addRole(@Param("id") long id, @Param("name") String name, @Param("description") String description, @Param("sqlDate") Date sqlDate);
+
+    /**
+     * 添加用户信息
+     * @param sysRole
+     * @return
+     */
+    int addRole(@Param("sysRole") SysRole sysRole);
+
+    /**
+     * 根据角色信息更新角色状态
+     * @param roleId
+     * @param status
+     * @return
+     */
+    int updateRoleStatue(@Param("roleId") Long roleId, @Param("status") Integer status);
 }

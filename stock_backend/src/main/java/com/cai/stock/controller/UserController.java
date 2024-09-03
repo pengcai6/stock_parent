@@ -135,7 +135,7 @@ public class UserController {
    })
    @ApiOperation(value = "批量删除用户信息，delete请求可通过请求体携带数据", notes = "批量删除用户信息，delete请求可通过请求体携带数据", httpMethod = "DELETE")
    @DeleteMapping("/user")
-   @PreAuthorize("hasAuthority('sys:user:delete')")
+//   @PreAuthorize("hasAuthority('sys:user:delete')")
     public R deleteUser(@RequestBody List<Long> userIds){
         return userService.deleteUser(userIds);
    }

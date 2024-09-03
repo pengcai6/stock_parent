@@ -1,6 +1,11 @@
 package com.cai.stock.mapper;
 
 import com.cai.stock.pojo.entity.SysRolePermission;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.sql.Timestamp;
+import java.util.List;
 
 /**
 * @author cai
@@ -8,6 +13,7 @@ import com.cai.stock.pojo.entity.SysRolePermission;
 * @createDate 2024-08-16 15:51:52
 * @Entity com.cai.stock.pojo.entity.SysRolePermission
 */
+@Mapper
 public interface SysRolePermissionMapper {
 
     int deleteByPrimaryKey(Long id);
@@ -22,4 +28,27 @@ public interface SysRolePermissionMapper {
 
     int updateByPrimaryKey(SysRolePermission record);
 
+    /**
+     * 根据角色id获取权限id列表
+     * @param roleId
+     * @return
+     */
+    List<Long> getPermsByRoleId(@Param("roleId") String roleId);
+
+    /**
+     * //通过角色id删除对应权限
+     * @param id
+     * @return
+     */
+    int deleteByRoleId(@Param("id") Long id);
+
+    /**
+     *  //批量添加用户对应权限
+     * @param list
+     * @param currentTime
+     * @return
+     */
+    int insertPerms(@Param("list") List<SysRolePermission> list, @Param("currentTime") Timestamp currentTime);
+
+    void deleteByUserId(@Param("userId") String userId);
 }
