@@ -26,7 +26,6 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.34</version>
         </dependency>
         <!--jackson相关注解，实现日期格式转换和类型格式转换并序列化等-->
         <dependency>
