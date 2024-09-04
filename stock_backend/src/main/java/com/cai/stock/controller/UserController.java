@@ -79,6 +79,7 @@ public class UserController {
     })
     @ApiOperation(value = "多条件综合查询用户分页信息，条件包含：分页信息 用户创建日期范围", notes = "多条件综合查询用户分页信息，条件包含：分页信息 用户创建日期范围", httpMethod = "POST")
     @PostMapping("/users")
+    //@PreAuthorize("hasAuthority('sys:user:list')")
     public R<PageResult<SysUser>> getUserByConditions(@RequestBody UserReVo reVo){
     return userService.getUserByConditions(reVo);
     }
@@ -93,6 +94,7 @@ public class UserController {
     })
     @ApiOperation(value = "添加用户", notes = "添加用户", httpMethod = "POST")
     @PostMapping("/user")
+    //@PreAuthorize("hasAuthority('sys:user:add')")
     public R insetUser(@RequestBody SysUser user ){
         return userService.insetUser(user);
     }
@@ -135,7 +137,7 @@ public class UserController {
    })
    @ApiOperation(value = "批量删除用户信息，delete请求可通过请求体携带数据", notes = "批量删除用户信息，delete请求可通过请求体携带数据", httpMethod = "DELETE")
    @DeleteMapping("/user")
-//   @PreAuthorize("hasAuthority('sys:user:delete')")
+   //@PreAuthorize("hasAuthority('sys:user:delete')")
     public R deleteUser(@RequestBody List<Long> userIds){
         return userService.deleteUser(userIds);
    }

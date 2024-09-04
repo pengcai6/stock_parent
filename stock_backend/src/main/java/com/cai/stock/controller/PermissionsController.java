@@ -6,6 +6,7 @@ import com.cai.stock.vo.resp.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -66,6 +67,7 @@ public class PermissionsController {
      * @return
      */
     @DeleteMapping("/permission/{permissionId}")
+    //@PreAuthorize("hasAuthority('sys:permission:delete')")
     public R deletePermission(@PathVariable("permissionId") Long permissionId )
     {
         return permissionService.deletePermission(permissionId);

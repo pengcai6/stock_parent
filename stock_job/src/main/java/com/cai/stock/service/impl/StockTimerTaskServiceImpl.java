@@ -1,6 +1,7 @@
 package com.cai.stock.service.impl;
 
 import com.cai.stock.constant.ParseType;
+import com.cai.stock.face.StockCacheFace;
 import com.cai.stock.mapper.*;
 import com.cai.stock.pojo.entity.StockBlockRtInfo;
 import com.cai.stock.pojo.entity.StockMarketIndexInfo;
@@ -56,6 +57,8 @@ public class StockTimerTaskServiceImpl implements StockTimerTaskService {
     private StockBlockRtInfoMapper stockBlockRtInfoMapper;
     @Autowired
     private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+    @Autowired
+    private StockCacheFace stockCacheFace;
     /*
     必须保证该对象初始化无状态
      */
@@ -155,11 +158,12 @@ public class StockTimerTaskServiceImpl implements StockTimerTaskService {
 
     @Override
     public void getStockRtInfo() {
-        //1.获取所有个股的集合 3000
-        List<String> allcodes = stockBusinessMapper.getAllStockCodes();
-
-        //添加业务前缀sh,zh
-        allcodes = allcodes.stream().map(code -> code.startsWith("6") ? "sh" + code : "sz" + code).collect(Collectors.toList());
+//        //1.获取所有个股的集合 3000
+//        List<String> allcodes = stockBusinessMapper.getAllStockCodes();
+//
+//        //添加业务前缀sh,zh
+//        allcodes = allcodes.stream().map(code -> code.startsWith("6") ? "sh" + code : "sz" + code).collect(Collectors.toList());
+        List<String> allcodes = stockCacheFace.getAllStockCodeWithPredix();
         //一次性将所有的集合拼接到url中，导致url过长，参数过多
         // String url= stockInfoConfig.getMarketUrl()+String.join(",",allcodes);
 //        System.out.println("allcodes = " + allcodes);

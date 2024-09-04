@@ -2,6 +2,7 @@ package com.cai.stock.service.impl;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.util.ObjectUtil;
+import com.cai.stock.face.RolesFace;
 import com.cai.stock.mapper.SysPermissionMapper;
 import com.cai.stock.mapper.SysRoleMapper;
 import com.cai.stock.mapper.SysRolePermissionMapper;
@@ -39,6 +40,9 @@ public class RolesServiceImpl implements RolesService {
     private SysPermissionMapper sysPermissionMapper;
     @Autowired
     private SysRolePermissionMapper sysRolePermissionMapper;
+    @Autowired
+    private RolesFace rolesFace;
+
 
     @Autowired
     private IdWorker idWorker;

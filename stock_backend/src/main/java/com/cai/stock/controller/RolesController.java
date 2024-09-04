@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -75,6 +76,7 @@ public class RolesController {
     })
     @ApiOperation(value = "更新角色信息，包含角色关联的权限信息", notes = "更新角色信息，包含角色关联的权限信息", httpMethod = "PUT")
     @PutMapping("/role")
+    //@PreAuthorize("hasAuthority('sys:role:update')")
     public R updateRolesPermissions(@RequestBody updatePermsByRoleIdReqVo reqVo) {
         return rolesService.updateRolesPermissions(reqVo);
     }
