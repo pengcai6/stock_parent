@@ -40,7 +40,6 @@ public class RolesFaceImpl implements RolesFace {
         List<SysRole> roles = sysRoleMapper.getRolesById(userid);
         return roles.stream().map(r -> "ROLE_" + r.getName()).collect(Collectors.toList());
     }
-    @Cacheable(cacheNames = "getPermissionTree",key = "#preId")
     @Override
     public List<menusPermDomain> getPermissionTree(List<SysPermission> perms, long preId) {
        return permissionService.getTree(perms, 0L);
