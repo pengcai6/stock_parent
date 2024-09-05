@@ -4,7 +4,7 @@ xxl:
     job:
         accessToken: ''
         admin:
-            addresses: http://192.168.200.129:8093/xxl-job-admin
+            addresses: http://47.236.120.155:8093/xxl-job-admin
         executor:
             address: ''
             appname: cai-stock-executor
