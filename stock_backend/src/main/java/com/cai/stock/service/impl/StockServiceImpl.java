@@ -72,7 +72,7 @@ public class StockServiceImpl implements StockService {
 //        Date curDate = curDateTime.toDate();
             //由于没有采集数据，目前使用假数据调试
             Date curDate = DateTimeUtil.getLastDate4Stock(DateTime.now()).toDate();
-            curDate = DateTime.parse("2022-07-07 14:51:00", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).toDate();
+            curDate = DateTime.parse("2022-01-02 09:42:00", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).toDate();
             //2.获取大盘集合编码
             List<String> mCodes = stockInfoConfig.getInner();
             //3.调用mapper查询数据
@@ -93,7 +93,7 @@ public class StockServiceImpl implements StockService {
     public R<List<ExternalMarKetDomain>> getExternalMarketInfo() {
         //1.获取股票交易的最新时间点
         Date curDate = DateTimeUtil.getLastDate4Stock(DateTime.now()).toDate();
-        curDate = DateTime.parse("2022-05-18 15:58:00", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).toDate();
+        curDate = DateTime.parse("2022-01-01 10:57:00", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).toDate();
         //2.获取大盘集合编码
         List<String> mCodes = stockInfoConfig.getOuter();
         //3.调用mapper查询数据,根据时间和大盘点数降序排序取前4
@@ -240,7 +240,7 @@ public class StockServiceImpl implements StockService {
     public R<List<StockBlockDomain>> sectorAllLimit() {
         //由于没有采集数据，目前使用假数据调试
         Date curDate = DateTimeUtil.getLastDate4Stock(DateTime.now()).toDate();
-        curDate = DateTime.parse("2021-12-21 14:30:00", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).toDate();
+        curDate = DateTime.parse("2022-01-03 10:30:00", DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss")).toDate();
         //调用mapper查询数据
         List<StockBlockDomain> data = stockBlockRtInfoMapper.sectorAllLimit(curDate);
         //组装数据
